@@ -24,8 +24,12 @@ use \Marando\JPLephem\DE\SSObj;
 
 class Pluto extends SolarSystObj {
 
-  protected function getJPLObj() {
-    return SSObj::Pluto(2370);
+  protected function getSSObj() {
+    return SSObj::Pluto(9);
+  }
+
+  protected function getPhysicalDiameter() {
+    return \Marando\Units\Distance::km(2370);
   }
 
 }

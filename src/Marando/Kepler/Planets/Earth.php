@@ -27,6 +27,9 @@ use \Marando\JPLephem\DE\SSObj;
 class Earth extends SolarSystObj {
 
 
+  protected function getSSObj() {
+    return SSObj::Earth();
+  }
 
 
   protected function getJPLObj() {

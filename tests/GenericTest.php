@@ -32,9 +32,77 @@ class GenericTest extends PHPUnit_Framework_TestCase {
 
   public function test() {
 
+    $e = new Earth();
+    $e->dateRange('2015-Nov-01', '2016-May-01', '30 days');
+    $e->topo(27, -82);
 
-    $e    = new Earth();
-    //$date = AstroDate::parse('2015-Dec-25 00:00:00', TimeStandard::TT());
+    $ephem = $e->observe(new Pluto);
+
+    //echo $ephem;
+
+    foreach ($ephem as $e)
+      echo "\n{$e->dateUTC}\t{$e->distTrue}\t{$e->distApparent}";
+
+
+    //echo 1;
+
+
+
+
+
+
+
+    return;
+    $e     = new Earth();
+    $date1 = AstroDate::now();
+    $date2 = $date1->copy()->add(Time::days(365 * 2));
+    $e->dateRange($date1, $date2, Time::days(60));
+
+
+
+
+    // retruns ephemeris object has ALL the suff
+    /* $ephem = $e->ephem();
+      foreach ($ephem as $e) {
+      /**
+     * RA/Dec ICRF/J2000.0 astrom
+     * RA/Dec Apparent
+     * Alt/Az Topographic
+     * Angular Diameter
+     * True distance
+     * Apparent distance
+     * light travel time
+     * cartesian
+     * true cartesian
+     * ...
+     */
+    // example
+    //echo "\n$e->date\t$e->radec\t$e->horiz\t$e->diam"
+    // }
+    // therefore should $e->observe($obj) and such
+    // just return the first date? yes maybe?
+    // or maybe it shouldnt even exist?
+    // OR........... ->observe() should be the ephemeris function?
+    // I mean if you want ->position ->observe etc.. kinda redundant
+    // and you can still get it from Ephem obj
+    // or you can just use DEReader
+
+
+
+
+
+
+    $pv   = $e->observe(new Mars);
+    $diam = $e->diam(new Mars);
+
+    for ($i = 0; $i < count($pv); $i++)
+      echo "\n{$pv[$i]->apparent()}\t$diam[$i]";
+
+
+
+    return;
+    $e = new Earth();
+    //$date = AstroDate::parse('2019-Jul-02 7:26:00', TimeStandard::TT());
     //$e->date($date);
     $e->date(AstroDate::now());
     $e->topo(Geo::deg(27, -82));
@@ -58,9 +126,9 @@ class GenericTest extends PHPUnit_Framework_TestCase {
       //echo "\n$p->id\t{$eq->apparent()}\t$eq->dist";
 
       $h = $e->observe($p)[0]->toHoriz();
-      echo "\n$p->id\t$h Dist $eq->dist\t" .$e->diam($p);
+      echo "\n$p->id\t$h Dist $eq->dist\t" . $e->diam($p);
     }
-
+//cache stuff. set raw results and clear when date chsnges so assumed valid if there
     return;
 
     $e = new Earth();

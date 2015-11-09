@@ -24,9 +24,14 @@ use \Marando\JPLephem\DE\SSObj;
 
 class Uranus extends SolarSystObj {
 
+  protected function getSSObj() {
+    return SSObj::Uranus();
+  }
+
   protected function getJPLObj() {
     return SSObj::Uranus();
   }
+
   protected function getPhysicalDiameter() {
     return \Marando\Units\Distance::km(51118);
   }

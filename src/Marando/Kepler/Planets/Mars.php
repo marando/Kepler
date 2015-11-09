@@ -24,6 +24,10 @@ use \Marando\JPLephem\DE\SSObj;
 
 class Mars extends SolarSystObj {
 
+  protected function getSSObj() {
+    return SSObj::Mars();
+  }
+
   protected function getJPLObj() {
     return SSObj::Mars();
   }
@@ -31,4 +35,5 @@ class Mars extends SolarSystObj {
   protected function getPhysicalDiameter() {
     return \Marando\Units\Distance::km(7692);
   }
+
 }
