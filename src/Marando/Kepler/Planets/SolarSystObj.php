@@ -20,69 +20,47 @@
 
 namespace Marando\Kepler\Planets;
 
+use \InvalidArgumentException;
 use \Marando\AstroCoord\Cartesian;
 use \Marando\AstroCoord\Frame;
+use \Marando\AstroCoord\Geo;
 use \Marando\AstroDate\AstroDate;
-use \Marando\JPLephem\DE\DE;
+use \Marando\AstroDate\TimeStandard;
 use \Marando\JPLephem\DE\Reader;
 use \Marando\Units\Distance;
+use \Marando\Units\Time;
 use \Marando\Units\Velocity;
 
 abstract class SolarSystObj {
 
+  //
+  // Constructors
+  //
+
+  public function __construct(AstroDate $date = null) {
+    $this->dates[0] = $date;
+    $this->reader   = new Reader($date);
+  }
+
+  // // // Static
+
+  public static function create(AstroDate $dt = null) {
+
+  }
+
+  //
+  // Properties
+  //
+
+  protected $dates = null;
+  protected $step  = null;
+  protected $topo  = null;
+
   /**
    *
-   * @var AstroDate
+   * @var Reader
    */
-  protected $date;
-
-  public static function at(AstroDate $date) {
-    $obj       = new static();
-    $obj->date = $date;
-
-    return $obj;
-  }
-
-  public function position(SolarSystObj $target = null) {
-    $de    = new Reader(DE::DE421());
-    $jdTDB = $this->date->toTDB()->jd;
-
-    $pv = [];
-    if ($target)
-      $pv = $de->jde($jdTDB)->position($target->id, $this->id);
-    else
-      $pv = $de->jde($jdTDB)->position($this->id);
-
-    $frame = Frame::ICRF();
-    $epoch = $this->date->toEpoch();
-    $x     = Distance::au($pv[0]);
-    $y     = Distance::au($pv[1]);
-    $z     = Distance::au($pv[2]);
-    $vx    = Velocity::aud($pv[3]);
-    $vy    = Velocity::aud($pv[4]);
-    $vz    = Velocity::aud($pv[5]);
-
-    return new Cartesian($frame, $epoch, $x, $y, $z, $vx, $vy, $vz);
-  }
-
-  public function observe(SolarSystObj $target) {
-    $de    = new Reader(DE::DE421());
-    $jdTDB = $this->date->toTDB()->jd;
-
-    $pv = $de->jde($jdTDB)->observe($target->id, $this->id);
-
-    $frame = Frame::ICRF();
-    $epoch = $this->date->toEpoch();
-    $x     = Distance::au($pv[0]);
-    $y     = Distance::au($pv[1]);
-    $z     = Distance::au($pv[2]);
-    $vx    = Velocity::aud($pv[3]);
-    $vy    = Velocity::aud($pv[4]);
-    $vz    = Velocity::aud($pv[5]);
-
-    $c = new Cartesian($frame, $epoch, $x, $y, $z, $vx, $vy, $vz);
-    return $c->toEquat();
-  }
+  protected $reader = null;
 
   public function __get($name) {
     switch ($name) {
@@ -91,5 +69,155 @@ abstract class SolarSystObj {
     }
   }
 
+  //
+  // Functions
+  //
+
+  public function date(AstroDate $dt) {
+    $this->dates = null;
+    $this->dates = [$dt];
+    $this->step  = null;
+  }
+
+  public function dates(array $dt) {
+    foreach ($dt as $d)
+      if ($d instanceof AstroDate == false)
+        throw new InvalidArgumentException('All $dt items must be of AstroDate type');
+
+    $this->dates = null;
+    $this->dates = $dt;
+    $this->step  = null;
+  }
+
+  public function dateRange(AstroDate $dt1, AstroDate $dt2, Time $step) {
+    $this->dates = null;
+    $this->dates = [$dt1, $dt2];
+    $this->step  = $step;
+  }
+
+  public function topo(Geo $topo) {
+    $this->topo = $topo;
+  }
+
+  public function observe(SolarSystObj $obj) {
+    $ephem = [];
+
+    if ($this->step) {
+      $jd1  = $this->dates[0]->copy()->toTDB()->jd;
+      $jd2  = $this->dates[1]->copy()->toTDB()->jd;
+      $step = $this->step->days;
+
+      for ($jd = $jd1; $jd < $jd2; $jd += $step) {
+        $pv = $this->reader->jde($jd)->observe($obj->id, $this->id, $lt);
+
+        $frame = Frame::ICRF();
+        $epoch = AstroDate::jd($jd, TimeStandard::TDB())->toEpoch();
+        $x     = Distance::au($pv[0]);
+        $y     = Distance::au($pv[1]);
+        $z     = Distance::au($pv[2]);
+        $vx    = Velocity::aud($pv[3]);
+        $vy    = Velocity::aud($pv[4]);
+        $vz    = Velocity::aud($pv[5]);
+
+        $c         = new Cartesian($frame, $epoch, $x, $y, $z, $vx, $vy, $vz);
+        $eq        = $c->toEquat();
+        $eq->obsrv = $this->topo;
+        $ephem[]   = $eq;
+      }
+    }
+    else {
+
+      foreach ($this->dates as $date) {
+        $pv = $this->reader->jde($date->jd)->observe($obj->id, $this->id);
+
+
+        $frame = Frame::ICRF();
+        $epoch = $date->toEpoch();
+        $x     = Distance::au($pv[0]);
+        $y     = Distance::au($pv[1]);
+        $z     = Distance::au($pv[2]);
+        $vx    = Velocity::aud($pv[3]);
+        $vy    = Velocity::aud($pv[4]);
+        $vz    = Velocity::aud($pv[5]);
+
+        $c         = new Cartesian($frame, $epoch, $x, $y, $z, $vx, $vy, $vz);
+        $eq        = $c->toEquat();
+        $eq->obsrv = $this->topo;
+        $ephem[]   = $eq;
+      }
+    }
+
+    return $ephem;
+  }
+
+  public function position(SolarSystObj $obj = null) {
+    $ephem = [];
+
+    if ($this->step) {
+      if ($obj == null) {
+        $jd1  = $this->dates[0]->copy()->toTDB()->jd;
+        $jd2  = $this->dates[1]->copy()->toTDB()->jd;
+        $step = $this->step->days;
+
+        for ($jd = $jd1; $jd < $jd2; $jd += $step) {
+          $pv = $this->reader->jde($jd)->position($this->id);
+
+          $frame = Frame::ICRF();
+          $epoch = AstroDate::jd($jd, TimeStandard::TDB())->toEpoch();
+          $x     = Distance::au($pv[0]);
+          $y     = Distance::au($pv[1]);
+          $z     = Distance::au($pv[2]);
+          $vx    = Velocity::aud($pv[3]);
+          $vy    = Velocity::aud($pv[4]);
+          $vz    = Velocity::aud($pv[5]);
+
+          $ephem[] = new Cartesian($frame, $epoch, $x, $y, $z, $vx, $vy, $vz);
+        }
+      }
+    }
+    else {
+      if ($obj == null) {
+        foreach ($this->dates as $date) {
+          $ephem[] = $this->reader->jde($date->jd)->position($this->id);
+        }
+      }
+    }
+
+    return $ephem;
+
+
+
+    /*
+      if ($obj == null) {
+      if ($this->step) {
+      $jd1  = $this->dates[0]->jd;
+      $jd2  = $this->dates[1]->jd;
+      $step = $this->step->days;
+
+      $ephem = [];
+      for ($jd = $jd1; $jd < $jd2; $jd += $step) {
+      $ephem[] = $this->reader->jde($jd)->position();
+      }
+      }
+      }
+     *
+     */
+  }
+
+  public function diam(SolarSystObj $obj) {
+    $d = $obj->getPhysicalDiameter()->au;
+    $D = $this->observe($obj)[0]->dist->au;
+    $δ = 206265 * $d / $D;
+
+    return \Marando\Units\Angle::arcsec($δ);
+  }
+
+  // // // Abstract
+
   abstract protected function getJPLObj();
+
+  protected function getPhysicalDiameter() {
+    return Distance::mi(8000);
+  }
+
 }

@@ -28,4 +28,8 @@ class Mercury extends SolarSystObj {
     return SSObj::Mercury();
   }
 
+  protected function getPhysicalDiameter() {
+    return \Marando\Units\Distance::km(4879);
+  }
+
 }

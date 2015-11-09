@@ -28,4 +28,8 @@ class Venus extends SolarSystObj {
     return SSObj::Venus();
   }
 
+  protected function getPhysicalDiameter() {
+    return \Marando\Units\Distance::km(12104);
+  }
+
 }

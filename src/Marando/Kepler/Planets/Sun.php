@@ -20,15 +20,18 @@
 
 namespace Marando\Kepler\Planets;
 
+use \Marando\AstroCoord\Geo;
+use \Marando\AstroDate\AstroDate;
 use \Marando\JPLephem\DE\SSObj;
 
-class Uranus extends SolarSystObj {
+class Sun extends SolarSystObj {
 
   protected function getJPLObj() {
-    return SSObj::Uranus();
+    return SSObj::Sun();
   }
+
   protected function getPhysicalDiameter() {
-    return \Marando\Units\Distance::km(51118);
+    return \Marando\Units\Distance::km(1392684);
   }
 
 }

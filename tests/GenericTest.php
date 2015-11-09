@@ -3,10 +3,26 @@
 namespace Marando\AstroCoord;
 
 use \Marando\AstroDate\AstroDate;
+use \Marando\AstroDate\TimeStandard;
+use \Marando\IAU\IAU;
+use \Marando\IAU\iauASTROM;
+use \Marando\JPLephem\DE\Reader;
+use \Marando\JPLephem\DE\SSObj;
 use \Marando\Kepler\Planets\Earth;
+use \Marando\Kepler\Planets\Jupiter;
+use \Marando\Kepler\Planets\Mars;
 use \Marando\Kepler\Planets\Mercury;
 use \Marando\Kepler\Planets\Moon;
+use \Marando\Kepler\Planets\Neptune;
 use \Marando\Kepler\Planets\Pluto;
+use \Marando\Kepler\Planets\Saturn;
+use \Marando\Kepler\Planets\Sun;
+use \Marando\Kepler\Planets\Uranus;
+use \Marando\Kepler\Planets\Venus;
+use \Marando\Units\Angle;
+use \Marando\Units\Distance;
+use \Marando\Units\Time;
+use \Marando\Units\Velocity;
 use \PHPUnit_Framework_TestCase;
 
 /**
@@ -16,26 +32,149 @@ class GenericTest extends PHPUnit_Framework_TestCase {
 
   public function test() {
 
-    echo Earth::at(AstroDate::now())->position()->toEquat();
+
+    $e    = new Earth();
+    //$date = AstroDate::parse('2015-Dec-25 00:00:00', TimeStandard::TT());
+    //$e->date($date);
+    $e->date(AstroDate::now());
+    $e->topo(Geo::deg(27, -82));
+
+    $planets = [
+        new Sun,
+        new Moon,
+        new Mercury,
+        new Venus,
+        new Mars,
+        new Jupiter,
+        new Saturn,
+        new Uranus,
+        new Neptune,
+        new Pluto
+    ];
+
+    foreach ($planets as $p) {
+      $eq = $e->observe($p)[0];
+
+      //echo "\n$p->id\t{$eq->apparent()}\t$eq->dist";
+
+      $h = $e->observe($p)[0]->toHoriz();
+      echo "\n$p->id\t$h Dist $eq->dist\t" .$e->diam($p);
+    }
+
+    return;
+
+    $e = new Earth();
+    $e->date(AstroDate::now());
+    $e->topo(Geo::deg(27, -82));
+    echo "\n\n";
+    echo "\n" . AstroDate::now();
+    echo "\n" . $e->observe(new Sun)[0];
+    echo "\n" . $e->observe(new Sun)[0]->apparent();
+    echo "\n" . $e->observe(new Sun)[0]->toHoriz();
 
 
-            return;
-/*
+    return;
 
 
-    $jd1  = AstroDate::parse('2015-11-01')->jd;
-    $jd2  = AstroDate::parse('2015-11-02')->jd;
-    $step = 0.1;
 
+    $e = new Earth();
+    //$e->dates([AstroDate::now(), AstroDate::now()]);
+
+    $dt1  = AstroDate::now();
+    $dt2  = $dt1->copy()->add(Time::days(1));
+    $step = Time::hours(1);
+    $e->dateRange($dt1, $dt2, $step);
+
+    $start = microtime(true);
+    $pv    = $e->observe(new Mercury);
+
+    foreach ($pv as $p)
+      echo "\n{$p->epoch->toDate()->jd}\t" . $p->toHoriz();
+    echo "\nSec> " . $time_elapsed_secs = microtime(true) - $start . "\n";
+
+    echo "\n\n";
+
+    return;
+    $r = new Reader();
+
+    $start = microtime(true);
+    for ($jd = 2457335.4168467; $jd < 2457420.4168467; $jd += 1) {
+
+      $pv1 = $r->jde($jd)->observe(SSObj::Mercury(), SSObj::Earth());
+
+      $frame = Frame::ICRF();
+      $epoch = AstroDate::jd($jd, TimeStandard::TDB())->toEpoch();
+      $x     = Distance::au($pv1[0]);
+      $y     = Distance::au($pv1[1]);
+      $z     = Distance::au($pv1[2]);
+      $vx    = Velocity::aud($pv1[3]);
+      $vy    = Velocity::aud($pv1[4]);
+      $vz    = Velocity::aud($pv1[5]);
+      $c     = new Cartesian($frame, $epoch, $x, $y, $z, $vx, $vy, $vz);
+      echo "\n{$jd}\t" . $c->toEquat();
+    }
+    echo "\nSec> " . $time_elapsed_secs = microtime(true) - $start . "\n";
+
+    return;
+
+    ///////
+    ///////
+    //////////////
+
+    $jd1  = AstroDate::now()->jd;
+    $jd2  = AstroDate::now()->add(Time::days(1))->jd;
+    $step = 0.05;
+    // todo cache objects to make this more efficient, date array maybe?
     for ($jd = $jd1; $jd < $jd2; $jd += $step) {
+      $dt  = AstroDate::jd($jd);
+      $geo = Geo::deg(28, -82);
+
+      $radec = Earth::topo($dt, $geo)->observe(new Uranus)->apparent();
+      $altaz = Earth::topo($dt, $geo)->observe(new Uranus)->toHoriz();
+      echo "\n{$dt}\t{$radec->ra->toAngle()->deg}";
+    }
+
+
+
+
+    return;
+
+
+
+    $date = AstroDate::parse('2015-Mar-20 00:00:00.000');
+
+    echo "\n\n" . Earth::at($date)->position();
+    echo "\n\n" . Earth::at($date)->position(new Mercury);
+    echo "\n\n" . Earth::at($date)->observe(new Mercury);
+    echo "\n" . Earth::at($date)->observe(new Mercury)->apparent();
+    echo "\n" . Earth::at($date)->observe(new Mercury)->apparent()->toHoriz();
+    echo "\n" . Earth::at($date)->observe(new Mercury)->toHoriz();
+
+    $geo = Geo::deg(27, -82);
+    echo "\n\n" . Earth::topo($date, $geo)->observe(new Mercury);
+    echo "\n" . Earth::topo($date, $geo)->observe(new Mercury)->apparent();
+    echo "\n" . Earth::topo($date, $geo)->observe(new Mercury)->apparent()->toHoriz();
+    echo "\n" . Earth::topo($date, $geo)->observe(new Mercury)->toHoriz();
+
+
+
+    return;
+    /*
+
+
+      $jd1  = AstroDate::parse('2015-11-01')->jd;
+      $jd2  = AstroDate::parse('2015-11-02')->jd;
+      $step = 0.1;
+
+      for ($jd = $jd1; $jd < $jd2; $jd += $step) {
       $date = AstroDate::jd($jd);
       $eq = Earth::at($date)->observe(new Uranus)->toHoriz();
 
       echo "\n$date->hour\t{$eq->alt->deg}\t{$eq->az->deg}";
       //echo "\n$date->year\t" . Earth::at($date)->observe(new Mercury);
-    }
+      }
 
-*/
+     */
 
 
 
@@ -51,8 +190,8 @@ class GenericTest extends PHPUnit_Framework_TestCase {
 
     for ($jd = $jd1; $jd < $jd2; $jd += $step) {
       $date = AstroDate::jd($jd);
-      $e = Earth::at($date)->apparent(new Moon);
-      $e1 = Earth::topo($date, Geo::deg(27,-82))->apparent(new Moon);
+      $e    = Earth::at($date)->apparent(new Moon);
+      $e1   = Earth::topo($date, Geo::deg(27, -82))->apparent(new Moon);
       echo "\n\t{$e->ra->toAngle()->deg}\t{$e->dec->deg}";
       echo "\n\t{$e1->ra->toAngle()->deg}\t{$e->dec->deg}\n";
     }

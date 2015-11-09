@@ -27,5 +27,8 @@ class Neptune extends SolarSystObj {
   protected function getJPLObj() {
     return SSObj::Neptune();
   }
+  protected function getPhysicalDiameter() {
+    return \Marando\Units\Distance::km(49528);
+  }
 
 }

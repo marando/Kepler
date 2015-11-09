@@ -4,25 +4,26 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "1d303bdabc26cd137a4ebaa5acbbe3d1",
-    "content-hash": "2ac781a948c8921323174bec60a99537",
+    "hash": "b90de92ae5bdf9060caa9323d8a21e94",
+    "content-hash": "68ece16a68781f9561233877258cc1f0",
     "packages": [
         {
             "name": "marando/astrocoord",
-            "version": "0.1-alpha",
+            "version": "0.1-alpha.3",
             "source": {
                 "type": "git",
                 "url": "https://github.com/marando/AstroCoord.git",
-                "reference": "9a9cd88f54be564fbbe780f4e94414b656eebf7c"
+                "reference": "d4fc9b81d3632b8841ab7fc1bedaac19c3ff3197"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/marando/AstroCoord/zipball/9a9cd88f54be564fbbe780f4e94414b656eebf7c",
-                "reference": "9a9cd88f54be564fbbe780f4e94414b656eebf7c",
+                "url": "https://api.github.com/repos/marando/AstroCoord/zipball/d4fc9b81d3632b8841ab7fc1bedaac19c3ff3197",
+                "reference": "d4fc9b81d3632b8841ab7fc1bedaac19c3ff3197",
                 "shasum": ""
             },
             "require": {
                 "marando/astrodate": "^0.3.2",
+                "marando/php-sofa": "^0.2.0",
                 "marando/units": "^0.3.2"
             },
             "require-dev": {
@@ -45,7 +46,7 @@
                 }
             ],
             "description": "A PHP package of objects representing astronomical coordinate systems",
-            "time": "2015-11-05 05:37:10"
+            "time": "2015-11-09 07:36:17"
         },
         {
             "name": "marando/astrodate",
@@ -90,20 +91,20 @@
         },
         {
             "name": "marando/jplephem",
-            "version": "0.1.2",
+            "version": "0.2.0-alpha.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/marando/JPLephem.git",
-                "reference": "d7c8f76febcc4629dabc7792fe291b47ce1d3928"
+                "reference": "7fc8c0841d3ff2140f479ce7017eba813d7a5377"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/marando/JPLephem/zipball/d7c8f76febcc4629dabc7792fe291b47ce1d3928",
-                "reference": "d7c8f76febcc4629dabc7792fe291b47ce1d3928",
+                "url": "https://api.github.com/repos/marando/JPLephem/zipball/7fc8c0841d3ff2140f479ce7017eba813d7a5377",
+                "reference": "7fc8c0841d3ff2140f479ce7017eba813d7a5377",
                 "shasum": ""
             },
             "require": {
-                "marando/units": "^0.3.1"
+                "marando/units": "^0.3.3"
             },
             "require-dev": {
                 "phpunit/phpunit": "^5.0"
@@ -125,20 +126,20 @@
                 }
             ],
             "description": "A PHP package that can read JPL DE ephemeris files",
-            "time": "2015-10-25 01:58:05"
+            "time": "2015-11-05 06:58:47"
         },
         {
             "name": "marando/php-sofa",
-            "version": "0.2-alpha.3",
+            "version": "0.2-alpha.6",
             "source": {
                 "type": "git",
                 "url": "https://github.com/marando/phpSOFA.git",
-                "reference": "1a0ac321dc62692d3e9f046b9a68914c46ebb85a"
+                "reference": "719893d8d9d475771b74e5e1628f3aefefdbb6e4"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/marando/phpSOFA/zipball/1a0ac321dc62692d3e9f046b9a68914c46ebb85a",
-                "reference": "1a0ac321dc62692d3e9f046b9a68914c46ebb85a",
+                "url": "https://api.github.com/repos/marando/phpSOFA/zipball/719893d8d9d475771b74e5e1628f3aefefdbb6e4",
+                "reference": "719893d8d9d475771b74e5e1628f3aefefdbb6e4",
                 "shasum": ""
             },
             "require-dev": {
@@ -161,7 +162,7 @@
                 }
             ],
             "description": "A PHP port of the IAU SOFA Library",
-            "time": "2015-11-01 06:29:47"
+            "time": "2015-11-09 06:43:50"
         },
         {
             "name": "marando/units",
@@ -1241,9 +1242,7 @@
     ],
     "aliases": [],
     "minimum-stability": "alpha",
-    "stability-flags": {
-        "marando/astrocoord": 15
-    },
+    "stability-flags": [],
     "prefer-stable": true,
     "prefer-lowest": false,
     "platform": [],

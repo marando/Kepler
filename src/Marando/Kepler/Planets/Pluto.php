@@ -25,7 +25,7 @@ use \Marando\JPLephem\DE\SSObj;
 class Pluto extends SolarSystObj {
 
   protected function getJPLObj() {
-    return SSObj::Pluto();
+    return SSObj::Pluto(2370);
   }
 
 }

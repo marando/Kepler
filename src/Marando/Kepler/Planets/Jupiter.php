@@ -22,13 +22,14 @@ namespace Marando\Kepler\Planets;
 
 use \Marando\JPLephem\DE\SSObj;
 
-class Uranus extends SolarSystObj {
+class Jupiter extends SolarSystObj {
 
   protected function getJPLObj() {
-    return SSObj::Uranus();
+    return SSObj::Jupiter();
   }
+
   protected function getPhysicalDiameter() {
-    return \Marando\Units\Distance::km(51118);
+    return \Marando\Units\Distance::km(142984);
   }
 
 }

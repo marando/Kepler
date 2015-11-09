@@ -26,37 +26,15 @@ use \Marando\JPLephem\DE\SSObj;
 
 class Earth extends SolarSystObj {
 
-  protected $location;
 
-  public static function topo(AstroDate $date, Geo $geo) {
-    $topo           = new static();
-    $topo->date     = $date;
-    $topo->location = $geo;
 
-    return $topo;
-  }
-
-  public function observe(SolarSystObj $target) {
-    $pos       = parent::observe($target);
-    $pos->topo = $this->topo;
-
-    return $pos;
-  }
-
-  /*
-    public function apparent(SolarSystObj $target) {
-    if ($this->location)
-    $app = parent::observe($target)->apparent($this->location);
-    else
-    $app = parent::observe($target)->apparent();
-
-    return $app;
-    }
-   *
-   */
 
   protected function getJPLObj() {
     return SSObj::Earth();
+  }
+
+  protected function getPhysicalDiameter() {
+    return \Marando\Units\Distance::km(12756);
   }
 
 }

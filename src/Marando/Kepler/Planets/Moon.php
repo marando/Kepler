@@ -28,4 +28,8 @@ class Moon extends SolarSystObj {
     return SSObj::Moon();
   }
 
+  protected function getPhysicalDiameter() {
+    return \Marando\Units\Distance::km(3475);
+  }
+
 }
