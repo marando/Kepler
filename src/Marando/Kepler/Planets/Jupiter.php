@@ -24,6 +24,10 @@ use \Marando\JPLephem\DE\SSObj;
 
 class Jupiter extends SolarSystObj {
 
+  protected function getSSObj() {
+    return SSObj::Jupiter();
+  }
+
   protected function getJPLObj() {
     return SSObj::Jupiter();
   }

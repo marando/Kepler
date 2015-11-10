@@ -33,18 +33,24 @@ class GenericTest extends PHPUnit_Framework_TestCase {
   public function test() {
 
     $e = new Earth();
-    $e->dateRange('2015-Nov-01', '2016-May-01', '30 days');
+    //$e->date('2015-Nov-08 23:20:34');
+    $e->date(2451550);
+    //$e->dateRange(AstroDate::now(), AstroDate::now()->add(Time::days(1)),'1 hour');
     $e->topo(27, -82);
 
-    $ephem = $e->observe(new Pluto);
+    $ephem = $e->observe(new Jupiter);
 
     //echo $ephem;
 
-    foreach ($ephem as $e)
-      echo "\n{$e->dateUTC}\t{$e->distTrue}\t{$e->distApparent}";
+    foreach ($ephem as $e) {
+      echo "\n\n";
+      echo "\n" . $e->radecAstrom;
+      echo "\n" . $e->radecApparent;
+      echo "\n" . $e->dateUTC;
+      echo "\n" . $e->distTrue;
+      echo "\n" . $e->dist;
+    }
 
-
-    //echo 1;
 
 
 

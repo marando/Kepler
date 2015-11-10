@@ -34,19 +34,31 @@ use \Marando\Units\Distance;
 use \Marando\Units\Time;
 use \Marando\Units\Velocity;
 
+/**
+ * Represents an solar system object
+ */
 abstract class SolarSystObj {
-
   //----------------------------------------------------------------------------
   // Constructors
   //----------------------------------------------------------------------------
 
+  /**
+   * Creates a new instance with optional initial date
+   * @param AstroDate $date
+   */
   public function __construct(AstroDate $date = null) {
+    // Set the date, and initialize a JPL DE reader to it
     $this->dates[0] = $date;
     $this->reader   = new Reader($date);
   }
 
   // // // Static
 
+  /**
+   * Creates a new instance with optional initial date
+   * @param  AstroDate $date
+   * @return static
+   */
   public static function create(AstroDate $date = null) {
     return new static($date);
   }
@@ -56,13 +68,14 @@ abstract class SolarSystObj {
   //----------------------------------------------------------------------------
 
   /**
-   * Full list of dates of this instance
+   * Full list of dates for this instance
    * @var AstroDate[]
    */
   protected $dates = null;
 
   /**
-   * If relevant, the interval between dates
+   * Time interval step between dates of this instance, null denotes discrete
+   * (non continuous) times were specified
    * @var Time
    */
   protected $dateStep = null;
@@ -83,72 +96,161 @@ abstract class SolarSystObj {
   // Functions
   //----------------------------------------------------------------------------
 
+  /**
+   * Sets a single date for the instance. The value may be either an AstroDate
+   * instance (preferred), a number representing a Julian day count, or a
+   * date/time string.
+   *
+   * @param  AstroDate|float|string $date
+   * @return static
+   */
   public function date($date) {
+    // If array provided... parse all dates otherwise parse single date
     return $this->dates(is_array($date) ? $date : [$date]);
   }
 
+  /**
+   * Sets multiple non-continuous discrete values for the instance. Each value
+   * may be either an AstroDate instance (preferred), a number representing a
+   * Julian day count, or a date/time string.
+   *
+   * @param  AstroDate[]|float[]|string[] $dates
+   * @return static
+   */
   public function dates(array $dates) {
+    // Nullify already set date information
     $this->dates = null;
     $this->step  = null;
 
+    // Add each date
     foreach ($dates as $date)
       $this->dates[] = static::parseAstroDate($date);
 
-    return $this;
+    return $this;  // Return instance for method chaining
   }
 
+  /**
+   * Sets a range of dates for the instance. The dates are interpolated between
+   * a starting and ending date using a specified time interval. Each date may
+   * be either an AstroDate instance (preferred), a number representing a Julian
+   * day count, or a date/time string. The time interval may be either a Time
+   * instance or a string representation of the interval, ex. '1 day'.
+   *
+   * @param  AstroDate|float|string $date1
+   * @param  AstroDate|float|string $dateN
+   * @param  Time|string            $step
+   *
+   * @return static
+   */
   public function dateRange($date1, $dateN, $step) {
-    $this->dates    = null;
+    // Clear existing dates
+    $this->dates = null;
+
+    // Parse step time interval
     $this->dateStep = static::parseTime($step);
 
-    $jd1     = static::parseAstroDate($date1)->jd;
-    $jdN     = static::parseAstroDate($dateN)->jd;
-    $dayIntv = $this->dateStep->days;
+    // Parse starting and ending date and get JD
+    $jd1 = static::parseAstroDate($date1)->jd;
+    $jdN = static::parseAstroDate($dateN)->jd;
 
-    for ($jd = $jd1; $jd <= $jdN; $jd += $dayIntv)
-      $this->dates[] = AstroDate::jd($jd);
+    // Iterate from start to end date using the step interval
+    for ($jd = $jd1; $jd <= $jdN; $jd += $this->dateStep)
+      $this->dates[] = AstroDate::jd($jd);  // Add each date
 
-    return $this;
+    return $this;  // Return instance for method chaining
   }
 
+  /**
+   * Sets an optional topographic geographic observation location for this
+   * instance. Each parameter may be an angle representing latitude or
+   * longitude (West -), or a string representation of the degree value with a
+   * cardinal direction, ex: 45.04542 N or 34.11245 W
+   *
+   * @param  Angle|string $lat
+   * @param  Angle|string $lon
+   * @return static
+   */
   public function topo($lat, $lon) {
+    // Parse lat/lon and normalize to appropriate ranges
     $lat = static::parseGeoLatLon($lat)->norm(-90, 90);
     $lon = static::parseGeoLatLon($lon)->norm(-180, 180);
 
+    // Set the observation location
     $this->obsrv = new Geo($lat, $lon);
-    return $this;
+
+    return $this;  // Return for method chaining
   }
 
+  /**
+   * Runs the ephemeris calculations for a target body for all dates and other
+   * parameters specified within this instance
+   * @param  static    $obj Target body
+   * @return Ephemeris      Ephemeris result
+   */
   public function observe(SolarSystObj $obj) {
+    // Initialize blank ephemeris
+    $ephem = new Ephemeris();
+
+    // Define target and center
     $target = $obj->getSSObj();
     $center = $this->getSSObj();
-    $ephem  = new Ephemeris();
 
-    foreach ($this->dates as $dt) {
-      $jdTDB = $dt->copy()->toTDB()->jd;
+    // Target physical diameter
+    $tgtPhysDiam = $obj->getPhysicalDiameter();
 
-      $pv   = $this->reader->jde($jdTDB)->position($target, $center);
-      $pv   = static::pvToCartesian($pv, $dt->copy()->toTDB());
-      $pvLT = $this->reader->jde($jdTDB)->observe($target, $center, $lt);
-      $pvLT = static::pvToCartesian($pvLT, $dt->copy()->toTDB());
+    // Run for each requested date
+    foreach ($this->dates as $date) {
+      // Get date in TDB
+      $dateTDB = $date->copy()->toTDB();
+      $jdeTDB  = $dateTDB->jd;
 
-      $equatIRCS        = $pvLT->toEquat();
-      $equatIRCS->obsrv = $this->obsrv;
-      $equatApparent    = $equatIRCS->apparent();
+      // Set the JDE of the reader
+      $de = $this->reader->jde($jdeTDB);
 
-      $e                = new Ephemeris();
-      $e->dateUTC       = $dt->copy()->toUTC();
-      $e->radecIRCS     = $equatIRCS;
+      // Obtain true and apparent cartesian pv-vector
+      $xyz   = static::pvToCartesian($de->position($target, $center), $date);
+      $xyzLT = static::pvToCartesian($de->observe($target, $center), $date);
+
+      // Astrometric ICRF/J2000.0 RA/Decl with topographic location
+      $equatICRF        = $xyzLT->toEquat();
+      $equatICRF->obsrv = $this->obsrv;
+
+      // Airless apparent RA/Decl
+      $equatApparent = $equatICRF->copy()->apparent();
+
+      // Initialize ephemeris item
+      $e = new Ephemeris();
+
+      // Set date stuff...
+      $e->dateUT   = $date->copy()->toUT1();
+      $e->dateUTC  = $date->copy()->toUTC();
+      $e->jdUT     = $e->dateUT->jd;
+      $e->jdUTC    = $e->dateUTC->jd;
+      $e->sidereal = $date->gast($this->obsrv->lon);
+
+      // Cartesian vectors
+      $e->xyzTrue   = $xyz;
+      $e->xyzAstrom = $xyzLT;
+
+      // Target-Observer true and apparent distance
+      $e->distTrue = $xyz->r;
+      $e->dist     = $xyzLT->r;
+
+      // RA/Decl
+      $e->radecAstrom   = $equatICRF;
       $e->radecApparent = $equatApparent;
-      $e->lightTime     = $lt->setUnit('sec');
-      $e->diameter      = static::diam($obj->getPhysicalDiameter(),
-                      $equatApparent->dist);
-      $e->distTrue      = $pv->r;
-      $e->distApparent  = $equatApparent->dist;
 
+      // Horizontal (Alt/Az)
+      $e->altaz = $equatApparent->toHoriz();
+
+      // Misc...
+      $e->diameter = static::diam($tgtPhysDiam, $e->dist);
+
+      // Insert the ephemeris item
       $ephem[] = $e;
     }
 
+    // Return the full ephemeris
     return $ephem;
   }
 
@@ -215,8 +317,9 @@ abstract class SolarSystObj {
     // TODO:: Parse like '27.65424 N'
   }
 
-  protected static function pvToCartesian($pv, $epoch) {
+  protected static function pvToCartesian($pv, $date) {
     $frame = Frame::ICRF();
+    $epoch = $date->toEpoch();
     $x     = Distance::au($pv[0]);
     $y     = Distance::au($pv[1]);
     $z     = Distance::au($pv[2]);
@@ -224,7 +327,7 @@ abstract class SolarSystObj {
     $vy    = Velocity::aud($pv[4]);
     $vz    = Velocity::aud($pv[5]);
 
-    return new Cartesian($frame, $epoch->toEpoch(), $x, $y, $z, $vx, $vy, $vz);
+    return new Cartesian($frame, $epoch, $x, $y, $z, $vx, $vy, $vz);
   }
 
   protected static function diam(Distance $diam, Distance $dist) {

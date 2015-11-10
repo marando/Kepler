@@ -24,6 +24,10 @@ use \Marando\JPLephem\DE\SSObj;
 
 class Venus extends SolarSystObj {
 
+  protected function getSSObj() {
+    return SSObj::Venus();
+  }
+
   protected function getJPLObj() {
     return SSObj::Venus();
   }

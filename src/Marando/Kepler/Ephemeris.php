@@ -20,22 +20,92 @@
 
 namespace Marando\Kepler;
 
-use \Marando\Units\Angle;
+use \ArrayAccess;
+use \Iterator;
+use \Marando\AstroCoord\Cartesian;
+use \Marando\AstroCoord\Equat;
+use \Marando\AstroCoord\Horiz;
+use \Marando\Units\Distance;
+use \Marando\Units\Time;
 
-class Ephemeris implements \ArrayAccess, \Iterator {
+class Ephemeris implements ArrayAccess, Iterator {
 
-  public $lightTime;
-  public $dateUTC       = null;
-  public $radecIRCS     = null;
-  public $radecApparent = null;
-  public $distApparent  = null;
-  public $distTrue      = null;
+  public $dateUTC;
+  public $dateUT;
+  public $jdUTC;
+  public $jdUT;
+
+  public $target;
+  public $center;
+  /**
+   * Geometric true cartesian position and velocity of the target
+   * @var Cartesian
+   */
+  public $xyzTrue;
 
   /**
-   *
-   * @var Angle
+   * Astrometric cartesian position and velocity of the target (includes target
+   * to observer light-time aberration)
+   * @var Cartesian
    */
-  public $diameter = null;
+  public $xyzAstrom;
+
+  /**
+   * Geometric true target to observer distance
+   * @var Distance
+   */
+  public $distTrue;
+
+  /**
+   * Astrometric (apparent) target to observer distance (includes target to
+   * observer light-time aberration
+   * @var Distance
+   */
+  public $dist;
+
+  /**
+   * ICRF/J2000.0 astrometric right ascension and declination of target center
+   * adjusted for light-time
+   * @var Equat
+   */
+  public $radecAstrom;
+
+  /**
+   * Airless apparent right ascension and declination of target center with
+   * respect to the Earth true-equator and the meridian containing the Earth
+   * true equinox of date. Adjusted for light-time, gravitational deflection of
+   * light, stellar aberration, precession & nutation. Topographic if an
+   * observation location was supplied.
+   * @var Equat
+   */
+  public $radecApparent;
+
+  /**
+   * Airless apparent azimuth and elevation of target center. Adjusted for
+   * light-time, the gravitational deflection of light, stellar aberration,
+   * precession and nutation. Topographic if an observation location was
+   * supplied.
+   * @var Horiz
+   */
+  public $altaz;
+  public $eclipAstrom;
+  public $eclipApparent;
+
+  /**
+   * Local Apparent Sidereal Time. The angle measured westward in the body
+   * true-equator of-date plane from the meridian containing the body-fixed
+   * observer to the meridian containing the true Earth equinox (defined by
+   * intersection of the true Earth equator of date with the ecliptic of date).
+   * @var Time
+   */
+  public $sidereal;
+  public $diameter;
+  public $eclipHeliocentr;
+  public $lightTime;
+  public $galactic;
+  public $solarTime;
+  public $hourAngle;
+  /////
 
   /**
    *
@@ -81,6 +151,10 @@ class Ephemeris implements \ArrayAccess, \Iterator {
 
   protected $position = 0;
 
+  /**
+   *
+   * @return static
+   */
   public function current() {
     return $this->items[$this->position];
   }
