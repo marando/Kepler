@@ -34,21 +34,46 @@ class GenericTest extends PHPUnit_Framework_TestCase {
 
     $e = new Earth();
     //$e->date('2015-Nov-08 23:20:34');
-    $e->date(2451550);
-    //$e->dateRange(AstroDate::now(), AstroDate::now()->add(Time::days(1)),'1 hour');
+    //$e->date('1992-Dec-20');
+    //$e->dateRange('2015-Nov-10 07:59:59', '2015-Nov-11 07:59:59', '3 hour');
+    $e->dateRange(AstroDate::now(), AstroDate::now()->add(Time::days(30)),
+            '5 days');
     $e->topo(27, -82);
 
-    $ephem = $e->observe(new Jupiter);
+    $ephem = $e->observe(new Moon);
 
-    //echo $ephem;
+    echo $ephem;
+    return;
 
+    foreach ($ephem as $e)
+      echo "\n"
+      . "$e->target\t"
+      . "$e->date\t"
+      . "$e->altaz\t"
+      . "$e->radec\t"
+      . "$e->phase\t"
+      . "$e->illum\t"
+      . "$e->diam\t"
+//. "$e->center\t"
+      //. "$e->location\t"
+      //. "$e->radecApparent"
+      ;
+    //. "{$e->dateUTC->year}-{$e->dateUTC->month}-{$e->dateUTC->day}\t"
+    //. "$e->altaz\t"
+    //. "{$e->diameter->arcsec}";
+
+
+    return;
     foreach ($ephem as $e) {
       echo "\n\n";
       echo "\n" . $e->radecAstrom;
       echo "\n" . $e->radecApparent;
+      echo "\n" . $e->eclipAstrom->lon->deg;
+      echo "\n" . $e->eclipAstrom->lat->deg;
       echo "\n" . $e->dateUTC;
       echo "\n" . $e->distTrue;
       echo "\n" . $e->dist;
+      echo "\n" . $e->altaz;
     }
 
 

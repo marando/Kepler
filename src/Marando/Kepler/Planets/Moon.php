@@ -24,6 +24,10 @@ use \Marando\JPLephem\DE\SSObj;
 
 class Moon extends SolarSystObj {
 
+  protected function getSSObj() {
+    return SSObj::Moon();
+  }
+
   protected function getJPLObj() {
     return SSObj::Moon();
   }

@@ -20,16 +20,17 @@
 
 namespace Marando\Kepler\Planets;
 
-use \Marando\Kepler\Ephemeris;
-use \Marando\Units\Angle;
 use \Exception;
 use \InvalidArgumentException;
 use \Marando\AstroCoord\Cartesian;
 use \Marando\AstroCoord\Frame;
 use \Marando\AstroCoord\Geo;
 use \Marando\AstroDate\AstroDate;
+use \Marando\AstroDate\Epoch;
 use \Marando\AstroDate\TimeStandard;
 use \Marando\JPLephem\DE\Reader;
+use \Marando\Kepler\Ephemeris;
+use \Marando\Units\Angle;
 use \Marando\Units\Distance;
 use \Marando\Units\Time;
 use \Marando\Units\Velocity;
@@ -154,7 +155,7 @@ abstract class SolarSystObj {
     $jdN = static::parseAstroDate($dateN)->jd;
 
     // Iterate from start to end date using the step interval
-    for ($jd = $jd1; $jd <= $jdN; $jd += $this->dateStep)
+    for ($jd = $jd1; $jd <= $jdN; $jd += $this->dateStep->days)
       $this->dates[] = AstroDate::jd($jd);  // Add each date
 
     return $this;  // Return instance for method chaining
@@ -198,25 +199,37 @@ abstract class SolarSystObj {
     // Target physical diameter
     $tgtPhysDiam = $obj->getPhysicalDiameter();
 
+    // Set the JDE of the reader
+    $de = $this->reader;
+
     // Run for each requested date
     foreach ($this->dates as $date) {
+      $start = microtime(true);
+
       // Get date in TDB
-      $dateTDB = $date->copy()->toTDB();
+      $dateTDB = $date->copy()->toTDB();    //////////////// 0.1 sec
       $jdeTDB  = $dateTDB->jd;
+      $epoch   = Epoch::jd($date->jd);
 
       // Set the JDE of the reader
-      $de = $this->reader->jde($jdeTDB);
+      $de->jde($jdeTDB);
 
       // Obtain true and apparent cartesian pv-vector
-      $xyz   = static::pvToCartesian($de->position($target, $center), $date);
-      $xyzLT = static::pvToCartesian($de->observe($target, $center), $date);
+      $xyz   = static::pvToCartesian($de->position($target, $center), $epoch);
+      $xyzLT = static::pvToCartesian($de->observe($target, $center, $lt), $epoch);
+
+      $absDiam = $obj->getPhysicalDiameter();
+      $ephem[] = Ephemeris::item($target, $center, $xyz, $xyzLT, $lt, $absDiam,
+                      $date, $this->obsrv);
+      continue;
+
 
       // Astrometric ICRF/J2000.0 RA/Decl with topographic location
       $equatICRF        = $xyzLT->toEquat();
       $equatICRF->obsrv = $this->obsrv;
 
       // Airless apparent RA/Decl
-      $equatApparent = $equatICRF->copy()->apparent();
+      $equatApparent = $xyzLT->toEquat()->apparent();
 
       // Initialize ephemeris item
       $e = new Ephemeris();
@@ -243,11 +256,16 @@ abstract class SolarSystObj {
       // Horizontal (Alt/Az)
       $e->altaz = $equatApparent->toHoriz();
 
+      // Ecliptic
+      $e->eclipAstrom   = $equatICRF->toEclip();
+      $e->eclipApparent = $equatApparent->toEclip();
+
       // Misc...
       $e->diameter = static::diam($tgtPhysDiam, $e->dist);
 
       // Insert the ephemeris item
       $ephem[] = $e;
+      echo "\n" . (microtime(true) - $start);
     }
 
     // Return the full ephemeris
@@ -317,15 +335,15 @@ abstract class SolarSystObj {
     // TODO:: Parse like '27.65424 N'
   }
 
-  protected static function pvToCartesian($pv, $date) {
+  protected static function pvToCartesian($pv, $epoch) {
     $frame = Frame::ICRF();
-    $epoch = $date->toEpoch();
-    $x     = Distance::au($pv[0]);
-    $y     = Distance::au($pv[1]);
-    $z     = Distance::au($pv[2]);
-    $vx    = Velocity::aud($pv[3]);
-    $vy    = Velocity::aud($pv[4]);
-    $vz    = Velocity::aud($pv[5]);
+
+    $x  = Distance::au($pv[0]);
+    $y  = Distance::au($pv[1]);
+    $z  = Distance::au($pv[2]);
+    $vx = Velocity::aud($pv[3]);
+    $vy = Velocity::aud($pv[4]);
+    $vz = Velocity::aud($pv[5]);
 
     return new Cartesian($frame, $epoch, $x, $y, $z, $vx, $vy, $vz);
   }
@@ -537,7 +555,7 @@ abstract
       $d       = $obj->getPhysicalDiameter()->au;
       $D       = $eph->apparent()->dist->au;
       $δ       = 206265 * $d / $D;
-      $diams[] = \Marando\Units\Angle::arcsec($δ);
+      $diams[] = Angle::arcsec($δ);
 
       /*
         $d       = $obj->getPhysicalDiameter()->au;
