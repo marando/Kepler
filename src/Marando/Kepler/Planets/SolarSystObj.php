@@ -215,57 +215,21 @@ abstract class SolarSystObj {
       $de->jde($jdeTDB);
 
       // Obtain true and apparent cartesian pv-vector
-      $xyz   = static::pvToCartesian($de->position($target, $center), $epoch);
-      $xyzLT = static::pvToCartesian($de->observe($target, $center, $lt), $epoch);
+      $startC = microtime(true);
+      $xyz    = static::pvToCartesian($de->position($target, $center), $epoch);
+      echo "\nPV->" . (microtime(true) - $startC);
+      $startB = microtime(true);
+      $xyzLT  = static::pvToCartesian($de->observe($target, $center, $lt),
+                      $epoch);
+      echo "\nPVlt->" . (microtime(true) - $startB);
 
       $absDiam = $obj->getPhysicalDiameter();
+      $startA  = microtime(true);
       $ephem[] = Ephemeris::item($target, $center, $xyz, $xyzLT, $lt, $absDiam,
                       $date, $this->obsrv);
-      continue;
+      echo "\nephem->" . (microtime(true) - $startA);
 
-
-      // Astrometric ICRF/J2000.0 RA/Decl with topographic location
-      $equatICRF        = $xyzLT->toEquat();
-      $equatICRF->obsrv = $this->obsrv;
-
-      // Airless apparent RA/Decl
-      $equatApparent = $xyzLT->toEquat()->apparent();
-
-      // Initialize ephemeris item
-      $e = new Ephemeris();
-
-      // Set date stuff...
-      $e->dateUT   = $date->copy()->toUT1();
-      $e->dateUTC  = $date->copy()->toUTC();
-      $e->jdUT     = $e->dateUT->jd;
-      $e->jdUTC    = $e->dateUTC->jd;
-      $e->sidereal = $date->gast($this->obsrv->lon);
-
-      // Cartesian vectors
-      $e->xyzTrue   = $xyz;
-      $e->xyzAstrom = $xyzLT;
-
-      // Target-Observer true and apparent distance
-      $e->distTrue = $xyz->r;
-      $e->dist     = $xyzLT->r;
-
-      // RA/Decl
-      $e->radecAstrom   = $equatICRF;
-      $e->radecApparent = $equatApparent;
-
-      // Horizontal (Alt/Az)
-      $e->altaz = $equatApparent->toHoriz();
-
-      // Ecliptic
-      $e->eclipAstrom   = $equatICRF->toEclip();
-      $e->eclipApparent = $equatApparent->toEclip();
-
-      // Misc...
-      $e->diameter = static::diam($tgtPhysDiam, $e->dist);
-
-      // Insert the ephemeris item
-      $ephem[] = $e;
-      echo "\n" . (microtime(true) - $start);
+      echo "\ntotal->" . (microtime(true) - $start)."\n";
     }
 
     // Return the full ephemeris

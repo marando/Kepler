@@ -36,24 +36,24 @@ class GenericTest extends PHPUnit_Framework_TestCase {
     //$e->date('2015-Nov-08 23:20:34');
     //$e->date('1992-Dec-20');
     //$e->dateRange('2015-Nov-10 07:59:59', '2015-Nov-11 07:59:59', '3 hour');
-    $e->dateRange(AstroDate::now(), AstroDate::now()->add(Time::days(30)),
-            '5 days');
+    $e->dateRange(AstroDate::now(), AstroDate::now()->add(Time::days(1)),
+            '30 min');
     $e->topo(27, -82);
 
     $ephem = $e->observe(new Moon);
 
-    echo $ephem;
-    return;
-
+   // echo $ephem;
+    //return;
+$startB = microtime(true);
     foreach ($ephem as $e)
       echo "\n"
-      . "$e->target\t"
+      //. "$e->target\t"
       . "$e->date\t"
       . "$e->altaz\t"
-      . "$e->radec\t"
-      . "$e->phase\t"
-      . "$e->illum\t"
-      . "$e->diam\t"
+      //. "$e->radec\t"
+      //. "$e->phase\t"
+      //. "$e->illum\t"
+      //. "$e->diam\t"
 //. "$e->center\t"
       //. "$e->location\t"
       //. "$e->radecApparent"
@@ -62,7 +62,7 @@ class GenericTest extends PHPUnit_Framework_TestCase {
     //. "$e->altaz\t"
     //. "{$e->diameter->arcsec}";
 
-
+echo "\nephem calc->" . (microtime(true) - $startB);
     return;
     foreach ($ephem as $e) {
       echo "\n\n";
@@ -188,7 +188,7 @@ class GenericTest extends PHPUnit_Framework_TestCase {
     $pv    = $e->observe(new Mercury);
 
     foreach ($pv as $p)
-      echo "\n{$p->epoch->toDate()->jd}\t" . $p->toHoriz();
+      echo "\n{$p->obsEpoch->toDate()->jd}\t" . $p->toHoriz();
     echo "\nSec> " . $time_elapsed_secs = microtime(true) - $start . "\n";
 
     echo "\n\n";

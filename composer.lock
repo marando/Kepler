@@ -4,21 +4,21 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "b90de92ae5bdf9060caa9323d8a21e94",
-    "content-hash": "68ece16a68781f9561233877258cc1f0",
+    "hash": "64ed82f380511bbf9f66d46e05922712",
+    "content-hash": "cd39f0788b286567ec2d676152d5b1bc",
     "packages": [
         {
             "name": "marando/astrocoord",
-            "version": "0.1-alpha.3",
+            "version": "dev-dev",
             "source": {
                 "type": "git",
                 "url": "https://github.com/marando/AstroCoord.git",
-                "reference": "d4fc9b81d3632b8841ab7fc1bedaac19c3ff3197"
+                "reference": "19ed33017d0a1d6fa8358f2202f2e2f945dd4632"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/marando/AstroCoord/zipball/d4fc9b81d3632b8841ab7fc1bedaac19c3ff3197",
-                "reference": "d4fc9b81d3632b8841ab7fc1bedaac19c3ff3197",
+                "url": "https://api.github.com/repos/marando/AstroCoord/zipball/19ed33017d0a1d6fa8358f2202f2e2f945dd4632",
+                "reference": "19ed33017d0a1d6fa8358f2202f2e2f945dd4632",
                 "shasum": ""
             },
             "require": {
@@ -46,7 +46,7 @@
                 }
             ],
             "description": "A PHP package of objects representing astronomical coordinate systems",
-            "time": "2015-11-09 07:36:17"
+            "time": "2015-11-10 07:50:29"
         },
         {
             "name": "marando/astrodate",
@@ -91,16 +91,16 @@
         },
         {
             "name": "marando/jplephem",
-            "version": "0.2.0-alpha.2",
+            "version": "0.2.0-alpha.3",
             "source": {
                 "type": "git",
                 "url": "https://github.com/marando/JPLephem.git",
-                "reference": "7fc8c0841d3ff2140f479ce7017eba813d7a5377"
+                "reference": "c90e97f7eafe46ca71ad58a22228189682840fa5"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/marando/JPLephem/zipball/7fc8c0841d3ff2140f479ce7017eba813d7a5377",
-                "reference": "7fc8c0841d3ff2140f479ce7017eba813d7a5377",
+                "url": "https://api.github.com/repos/marando/JPLephem/zipball/c90e97f7eafe46ca71ad58a22228189682840fa5",
+                "reference": "c90e97f7eafe46ca71ad58a22228189682840fa5",
                 "shasum": ""
             },
             "require": {
@@ -126,7 +126,7 @@
                 }
             ],
             "description": "A PHP package that can read JPL DE ephemeris files",
-            "time": "2015-11-05 06:58:47"
+            "time": "2015-11-11 07:57:11"
         },
         {
             "name": "marando/php-sofa",
@@ -1242,7 +1242,9 @@
     ],
     "aliases": [],
     "minimum-stability": "alpha",
-    "stability-flags": [],
+    "stability-flags": {
+        "marando/astrocoord": 20
+    },
     "prefer-stable": true,
     "prefer-lowest": false,
     "platform": [],
