@@ -287,15 +287,19 @@ class Ephemeris implements ArrayAccess, Iterator {
   }
 
   public function __toString() {
-    $i   = new static();
+    $e   = new static();
     $str = "\n";
 
-    foreach ($this->items as $i) {
-      $y = $i->date->year;
-      $m = $i->date->monthName(false);
-      $d = sprintf("%02.0f", $i->date->day);
-      $str .= "$y-$m-$d\t"
-              . "{$i->radec}\n";
+    foreach ($this->items as $e) {
+      $y = $e->date->year;
+      $m = $e->date->monthName(false);
+      $d = sprintf("%02.0f", $e->date->day);
+      $h = sprintf("%02.0f", $e->date->hour);
+      $i = sprintf("%02.0f", $e->date->min);
+      $s = sprintf("%02.0f", $e->date->sec);
+
+      //$str .= "$y-$m-$d $h:$i:$s  {$e->radecApparent}\n";
+      $str .= "$e->date  {$e->radecApparent}\n";
     }
 
     return $str;
