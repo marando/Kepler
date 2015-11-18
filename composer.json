@@ -3,7 +3,7 @@
   "description": "A PHP planetary ephemeris and general astronomy package",
   "require": {
     "marando/astrodate": "^0.3.2",
-    "marando/jplephem": "^0.2",
+    "marando/jplephem": "^1.0",
     "marando/units": "^0.3.3",
     "marando/astrocoord": "dev-dev"
   },

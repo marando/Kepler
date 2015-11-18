@@ -333,8 +333,17 @@ class Ephemeris implements ArrayAccess, Iterator {
    * @return string
    */
   public function __toString() {
+    $geod = " ({$this[0]->obsrv})";
+    $str = <<<HEADER
+
+---------------------------------------------------------------------------------
+Target name | {$this[0]->target}
+Center name | {$this[0]->center}{$geod}
+---------------------------------------------------------------------------------
+
+HEADER;
+
     $e   = new static();
-    $str = "\n";
     foreach ($this->items as $e) {
       $y = $e->date->year;
       $m = $e->date->monthName(false);
@@ -343,7 +352,8 @@ class Ephemeris implements ArrayAccess, Iterator {
       $i = sprintf("%02.0f", $e->date->min);
       $s = sprintf("%02.0f", $e->date->sec);
 
-      $str .= "$e->date  {$e->radecApparent}\n";
+      //$str .= "$e->date  {$e->radecApparent}\n";
+      $str .= "$e->date  {$e->radec}\n";
     }
 
     return $str;

@@ -4,8 +4,8 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "64ed82f380511bbf9f66d46e05922712",
-    "content-hash": "cd39f0788b286567ec2d676152d5b1bc",
+    "hash": "a4619d61f4775d7abf22f4287589c194",
+    "content-hash": "4a145bc1e0f228a4f45cefc6b09b87ec",
     "packages": [
         {
             "name": "marando/astrocoord",
@@ -91,16 +91,16 @@
         },
         {
             "name": "marando/jplephem",
-            "version": "0.2.0-alpha.3",
+            "version": "1.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/marando/JPLephem.git",
-                "reference": "c90e97f7eafe46ca71ad58a22228189682840fa5"
+                "reference": "6879399fd11505687de571efd8bd201a81185acc"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/marando/JPLephem/zipball/c90e97f7eafe46ca71ad58a22228189682840fa5",
-                "reference": "c90e97f7eafe46ca71ad58a22228189682840fa5",
+                "url": "https://api.github.com/repos/marando/JPLephem/zipball/6879399fd11505687de571efd8bd201a81185acc",
+                "reference": "6879399fd11505687de571efd8bd201a81185acc",
                 "shasum": ""
             },
             "require": {
@@ -126,7 +126,7 @@
                 }
             ],
             "description": "A PHP package that can read JPL DE ephemeris files",
-            "time": "2015-11-11 07:57:11"
+            "time": "2015-11-11 20:05:36"
         },
         {
             "name": "marando/php-sofa",

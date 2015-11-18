@@ -26,7 +26,7 @@ use \Marando\JPLephem\DE\SSObj;
 
 class Saturn extends SolarSystObj {
 
-  protected function getJPLObj() {
+  protected function getSSObj() {
     return SSObj::Saturn();
   }
 protected function getPhysicalDiameter() {

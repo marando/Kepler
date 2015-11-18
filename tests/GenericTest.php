@@ -34,23 +34,30 @@ class GenericTest extends PHPUnit_Framework_TestCase {
 
     $e = new Earth();
     //$e->date('2015-Nov-08 23:20:34');
-    //$e->date('1992-Dec-20');
-    //$e->dateRange('2015-Nov-10 07:59:59', '2015-Nov-11 07:59:59', '3 hour');
-    $e->dateRange(AstroDate::now(), AstroDate::now()->add(Time::days(1)),
-            '30 min');
-    $e->topo(27, -82);
+    $e->date('1992-Dec-20');
+    //$e->dateRange(AstroDate::now(), '2015-Nov-16', '1 Hour');
+    //$e->dateRange('1990-nov-01', '2040-nov-01', '365.25 days');
+    //$e->dateRange(AstroDate::now(), AstroDate::now()->add(Time::days(365 * 2)),'5 days');
+    $e->topo('27.9681 N', '82.4764 W');
 
-    $ephem = $e->observe(new Moon);
+    echo $ephem = $e->observe(new Moon);
 
-   // echo $ephem;
+return;
+/////add thing to show solar time or like:
+////////Day / Twilights / astronom / civil etc...
+    // echo $ephem;
     //return;
-$startB = microtime(true);
+    $startB = microtime(true);
     foreach ($ephem as $e)
       echo "\n"
-      //. "$e->target\t"
       . "$e->date\t"
+      //. "$e->target\t"
+      //. "{$e->date->year}-{$e->date->monthName(false)}-{$e->date->day}\t"
       . "$e->altaz\t"
-      //. "$e->radec\t"
+      //. "$e->radecApparent\t"
+      // . "{$e->dist->au}\t"
+      . "{$e->radecApparent}\t"
+//. "$e->radec\t"
       //. "$e->phase\t"
       //. "$e->illum\t"
       //. "$e->diam\t"
@@ -62,7 +69,7 @@ $startB = microtime(true);
     //. "$e->altaz\t"
     //. "{$e->diameter->arcsec}";
 
-echo "\nephem calc->" . (microtime(true) - $startB);
+    echo "\nephem calc->" . (microtime(true) - $startB);
     return;
     foreach ($ephem as $e) {
       echo "\n\n";

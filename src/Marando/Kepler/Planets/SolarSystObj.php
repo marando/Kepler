@@ -229,7 +229,7 @@ abstract class SolarSystObj {
                       $date, $this->obsrv);
       echo "\nephem->" . (microtime(true) - $startA);
 
-      echo "\ntotal->" . (microtime(true) - $start)."\n";
+      echo "\ntotal->" . (microtime(true) - $start) . "\n";
     }
 
     // Return the full ephemeris
@@ -296,7 +296,27 @@ abstract class SolarSystObj {
     if (is_numeric($latlon))
       return Angle::deg($latlon);
 
-    // TODO:: Parse like '27.65424 N'
+    if (!preg_match('/^([0-9]*\.*[0-9]*)\s*([nsewNSEW]*)$/', $latlon, $tokens))
+      throw new Exception("Unable to parse lat/lon {$latlon}");
+
+    // Get the numeric and time span
+    $number   = abs($tokens[1]);
+    $cardinal = strtoupper($tokens[2]);
+
+    // Parse the time span
+    switch ($cardinal) {
+      case 'N':
+        return Angle::deg($number);
+
+      case 'S':
+        return Angle::deg($number)->negate();
+
+      case 'E':
+        return Angle::deg($number);
+
+      case 'W':
+        return Angle::deg($number)->negate();
+    }
   }
 
   protected static function pvToCartesian($pv, $epoch) {
@@ -334,7 +354,7 @@ abstract
   // Constructors
   //
 
-  public function __construct(AstroDate $date = null) {
+            public function __construct(AstroDate $date = null) {
     $this->dates[0] = $date;
     $this->reader   = new Reader($date);
   }
@@ -349,7 +369,7 @@ abstract
   // Properties
   //
 
-  protected $dates = null;
+            protected $dates = null;
   protected $step  = null;
   protected $topo  = null;
   protected $ephem = null;
@@ -371,7 +391,7 @@ abstract
   // Functions
   //
 
-  public function date(AstroDate $dt) {
+            public function date(AstroDate $dt) {
     $this->dates = null;
     $this->dates = [$dt];
     $this->step  = null;
