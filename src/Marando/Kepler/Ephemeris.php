@@ -267,7 +267,7 @@ class Ephemeris implements ArrayAccess, Iterator {
    */
   protected function eclipHelio() {
     // Get heliocentric position & velocity vector
-    $de      = (new Reader())->jde($this->date->copy()->toTDB()->jd);
+    $de      = (new Reader())->jde($this->date->copy()->toTDB()->toJD());
     $pvhelio = $de->position($this->target, SSObj::Sun());
 
     // raw pv-vector -> cartesian
@@ -334,28 +334,30 @@ class Ephemeris implements ArrayAccess, Iterator {
    */
   public function __toString() {
     $geod = " ({$this[0]->obsrv})";
-    $str = <<<HEADER
+    $str  = <<<HEADER
 
----------------------------------------------------------------------------------
-Target name | {$this[0]->target}
-Center name | {$this[0]->center}{$geod}
----------------------------------------------------------------------------------
+============================================================================================
+ TARGET: {$this[0]->target}
+ CENTER: {$this[0]->center}{$geod}
+--------------------------------------------------------------------------------------------
+        Date & Time         |        Apparent R.A. & Dec        |     Apparent Alt & Az
+----------------------------|-----------------------------------|---------------------------
 
 HEADER;
 
-    $e   = new static();
+    $e = new static();
     foreach ($this->items as $e) {
-      $y = $e->date->year;
-      $m = $e->date->monthName(false);
-      $d = sprintf("%02.0f", $e->date->day);
-      $h = sprintf("%02.0f", $e->date->hour);
-      $i = sprintf("%02.0f", $e->date->min);
-      $s = sprintf("%02.0f", $e->date->sec);
+      $dist = $e->dist->setUnit('au');
+      $dist = $dist->au < 1 ? $dist->setUnit('km') : $dist;
 
-      //$str .= "$e->date  {$e->radecApparent}\n";
-      $str .= "$e->date  {$e->radec}\n";
+      $str .= $e->date->format('Y-M-d h:i:s A T');
+      $str .= " | {$e->radecApparent->format('α RhʰRmᵐRsˢ.Ru, δ +Dd°Dm\'Ds".Du')}";
+      $str .= " | {$e->altaz->format('h +H°, \A A°')}";
+
+      $str .= "\n";
     }
 
+    $str .= str_repeat('=', 92);
     return $str;
   }
 

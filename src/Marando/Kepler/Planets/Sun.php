@@ -26,10 +26,9 @@ use \Marando\JPLephem\DE\SSObj;
 
 class Sun extends SolarSystObj {
 
-  protected function getJPLObj() {
+  protected function getSSObj() {
     return SSObj::Sun();
   }
-
   protected function getPhysicalDiameter() {
     return \Marando\Units\Distance::km(1392684);
   }

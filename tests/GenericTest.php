@@ -33,16 +33,24 @@ class GenericTest extends PHPUnit_Framework_TestCase {
   public function test() {
 
     $e = new Earth();
-    //$e->date('2015-Nov-08 23:20:34');
-    $e->date('1992-Dec-20');
-    //$e->dateRange(AstroDate::now(), '2015-Nov-16', '1 Hour');
+    $now = AstroDate::now('EST');
+            echo "\n".$now->sidereal('a', Angle::deg(-82));
+    //echo $e->planetary(AstroDate::parse('2016-Mar-20 00:00:00 TT'));
+    echo $e->planetary($now);
+    exit;
+
+
+    $now = AstroDate::now('EST');
+    $e->dateRange($now, $now->copy()->add(Time::days(1)), '1 Hours');
+
+
     //$e->dateRange('1990-nov-01', '2040-nov-01', '365.25 days');
     //$e->dateRange(AstroDate::now(), AstroDate::now()->add(Time::days(365 * 2)),'5 days');
     $e->topo('27.9681 N', '82.4764 W');
 
-    echo $ephem = $e->observe(new Moon);
-
+    echo $ephem = $e->observe(new Mars);
 return;
+
 /////add thing to show solar time or like:
 ////////Day / Twilights / astronom / civil etc...
     // echo $ephem;
@@ -50,13 +58,15 @@ return;
     $startB = microtime(true);
     foreach ($ephem as $e)
       echo "\n"
-      . "$e->date\t"
+      //. $ephem->eclip."\t"
+      . $e->date->setTimezone('est')->format('Y-m-d h:i:s A T') . "\t"
       //. "$e->target\t"
       //. "{$e->date->year}-{$e->date->monthName(false)}-{$e->date->day}\t"
       . "$e->altaz\t"
+      . $e->dist->setUnit('km') . "\t"
       //. "$e->radecApparent\t"
       // . "{$e->dist->au}\t"
-      . "{$e->radecApparent}\t"
+      //. "{$e->radecApparent->format(Equat::FORMAT_DEFAULT_NF)}\t"
 //. "$e->radec\t"
       //. "$e->phase\t"
       //. "$e->illum\t"

@@ -151,12 +151,14 @@ abstract class SolarSystObj {
     $this->dateStep = static::parseTime($step);
 
     // Parse starting and ending date and get JD
-    $jd1 = static::parseAstroDate($date1)->jd;
-    $jdN = static::parseAstroDate($dateN)->jd;
+    $jd1 = static::parseAstroDate($date1)->toUTC()->toJD();
+    $jdN = static::parseAstroDate($dateN)->toUTC()->toJD();
+
+    $tz = $date1 instanceof AstroDate ? $date1->timezone : '';
 
     // Iterate from start to end date using the step interval
     for ($jd = $jd1; $jd <= $jdN; $jd += $this->dateStep->days)
-      $this->dates[] = AstroDate::jd($jd);  // Add each date
+      $this->dates[] = AstroDate::jd($jd)->setTimezone($tz);  // Add each date
 
     return $this;  // Return instance for method chaining
   }
@@ -208,11 +210,12 @@ abstract class SolarSystObj {
 
       // Get date in TDB
       $dateTDB = $date->copy()->toTDB();    //////////////// 0.1 sec
-      $jdeTDB  = $dateTDB->jd;
-      $epoch   = Epoch::jd($date->jd);
+      $jdeTDB  = $dateTDB->toJD();
+      $epoch   = $date->toEpoch();
 
       // Set the JDE of the reader
       $de->jde($jdeTDB);
+      $b = $de->position($target, $center);
 
       // Obtain true and apparent cartesian pv-vector
       $startC = microtime(true);
@@ -319,7 +322,7 @@ abstract class SolarSystObj {
     }
   }
 
-  protected static function pvToCartesian($pv, $epoch) {
+  protected static function pvToCartesian(array $pv, $epoch) {
     $frame = Frame::ICRF();
 
     $x  = Distance::au($pv[0]);

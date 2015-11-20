@@ -4,25 +4,26 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "a4619d61f4775d7abf22f4287589c194",
-    "content-hash": "4a145bc1e0f228a4f45cefc6b09b87ec",
+    "hash": "74edc0dd6d2b06cbf484d9a6d0c265d9",
+    "content-hash": "50e8206952c99e9f392b73b56e6bfe5a",
     "packages": [
         {
             "name": "marando/astrocoord",
-            "version": "dev-dev",
+            "version": "0.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/marando/AstroCoord.git",
-                "reference": "19ed33017d0a1d6fa8358f2202f2e2f945dd4632"
+                "reference": "0b9723e0cdac3c88b28abdec447d9b841ecd4c36"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/marando/AstroCoord/zipball/19ed33017d0a1d6fa8358f2202f2e2f945dd4632",
-                "reference": "19ed33017d0a1d6fa8358f2202f2e2f945dd4632",
+                "url": "https://api.github.com/repos/marando/AstroCoord/zipball/0b9723e0cdac3c88b28abdec447d9b841ecd4c36",
+                "reference": "0b9723e0cdac3c88b28abdec447d9b841ecd4c36",
                 "shasum": ""
             },
             "require": {
-                "marando/astrodate": "^0.3.2",
+                "marando/astrodate": "^1.0",
+                "marando/php-iers": "^0.1.3",
                 "marando/php-sofa": "^0.2.0",
                 "marando/units": "^0.3.2"
             },
@@ -46,26 +47,27 @@
                 }
             ],
             "description": "A PHP package of objects representing astronomical coordinate systems",
-            "time": "2015-11-10 07:50:29"
+            "time": "2015-11-20 05:40:18"
         },
         {
             "name": "marando/astrodate",
-            "version": "0.3.2",
+            "version": "1.0.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/marando/AstroDate.git",
-                "reference": "ba0753154c6b4fc76e4980f970d96588739a51b8"
+                "reference": "6d889955259cce670ae00e982ca63da124529d3a"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/marando/AstroDate/zipball/ba0753154c6b4fc76e4980f970d96588739a51b8",
-                "reference": "ba0753154c6b4fc76e4980f970d96588739a51b8",
+                "url": "https://api.github.com/repos/marando/AstroDate/zipball/6d889955259cce670ae00e982ca63da124529d3a",
+                "reference": "6d889955259cce670ae00e982ca63da124529d3a",
                 "shasum": ""
             },
             "require": {
-                "marando/php-sofa": "^0.2",
-                "marando/units": "^0.3.2",
-                "php": "^5.5"
+                "marando/php-iers": "^0.1.3",
+                "marando/php-sofa": "^0.2.0@alpha",
+                "marando/units": "^0.3.3",
+                "php": "^5.6"
             },
             "require-dev": {
                 "phpunit/phpunit": "^5.0"
@@ -86,8 +88,8 @@
                     "email": "a.marando@me.com"
                 }
             ],
-            "description": "A PHP Date/Time class with useful Astronomy related functionality ",
-            "time": "2015-10-30 19:44:07"
+            "description": "A PHP Date/Time class with useful astronomy related functionality",
+            "time": "2015-11-19 02:49:32"
         },
         {
             "name": "marando/jplephem",
@@ -129,18 +131,60 @@
             "time": "2015-11-11 20:05:36"
         },
         {
-            "name": "marando/php-sofa",
-            "version": "0.2-alpha.6",
+            "name": "marando/php-iers",
+            "version": "0.1.3",
             "source": {
                 "type": "git",
-                "url": "https://github.com/marando/phpSOFA.git",
-                "reference": "719893d8d9d475771b74e5e1628f3aefefdbb6e4"
+                "url": "https://github.com/marando/phpIERS.git",
+                "reference": "eb97612c0c64ede35a1dcde5338fc4575192b5cf"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/marando/phpSOFA/zipball/719893d8d9d475771b74e5e1628f3aefefdbb6e4",
-                "reference": "719893d8d9d475771b74e5e1628f3aefefdbb6e4",
+                "url": "https://api.github.com/repos/marando/phpIERS/zipball/eb97612c0c64ede35a1dcde5338fc4575192b5cf",
+                "reference": "eb97612c0c64ede35a1dcde5338fc4575192b5cf",
                 "shasum": ""
+            },
+            "require": {
+                "php": "^5.6"
+            },
+            "require-dev": {
+                "phpunit/phpunit": "^5.0"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-0": {
+                    "Marando": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "GNU2"
+            ],
+            "authors": [
+                {
+                    "name": "Ashley Marando",
+                    "email": "a.marando@me.com"
+                }
+            ],
+            "description": "A PHP package that simplifies obtaining Earth rotation values from IERS bulletins.",
+            "time": "2015-11-14 22:57:43"
+        },
+        {
+            "name": "marando/php-sofa",
+            "version": "0.2-alpha.8",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/marando/phpSOFA.git",
+                "reference": "1a13002023a9dcc496e901c2a6a8d15427f1d1a9"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/marando/phpSOFA/zipball/1a13002023a9dcc496e901c2a6a8d15427f1d1a9",
+                "reference": "1a13002023a9dcc496e901c2a6a8d15427f1d1a9",
+                "shasum": ""
+            },
+            "require": {
+                "marando/php-iers": "^0.1.3"
             },
             "require-dev": {
                 "phpunit/phpunit": "^5.0"
@@ -162,7 +206,7 @@
                 }
             ],
             "description": "A PHP port of the IAU SOFA Library",
-            "time": "2015-11-09 06:43:50"
+            "time": "2015-11-15 23:56:29"
         },
         {
             "name": "marando/units",
@@ -261,16 +305,16 @@
         },
         {
             "name": "myclabs/deep-copy",
-            "version": "1.4.0",
+            "version": "1.5.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/myclabs/DeepCopy.git",
-                "reference": "d8093b631a31628342d0703764935f8bac2c56b1"
+                "reference": "e3abefcd7f106677fd352cd7c187d6c969aa9ddc"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/myclabs/DeepCopy/zipball/d8093b631a31628342d0703764935f8bac2c56b1",
-                "reference": "d8093b631a31628342d0703764935f8bac2c56b1",
+                "url": "https://api.github.com/repos/myclabs/DeepCopy/zipball/e3abefcd7f106677fd352cd7c187d6c969aa9ddc",
+                "reference": "e3abefcd7f106677fd352cd7c187d6c969aa9ddc",
                 "shasum": ""
             },
             "require": {
@@ -299,7 +343,7 @@
                 "object",
                 "object graph"
             ],
-            "time": "2015-10-05 15:07:09"
+            "time": "2015-11-07 22:20:37"
         },
         {
             "name": "phpdocumentor/reflection-docblock",
@@ -412,16 +456,16 @@
         },
         {
             "name": "phpunit/php-code-coverage",
-            "version": "3.0.1",
+            "version": "3.0.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/sebastianbergmann/php-code-coverage.git",
-                "reference": "c84f05be256cd7c9d2340b26f7995b4afbf8787b"
+                "reference": "f7bb5cddf4ffe113eeb737b05241adb947b43f9d"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/sebastianbergmann/php-code-coverage/zipball/c84f05be256cd7c9d2340b26f7995b4afbf8787b",
-                "reference": "c84f05be256cd7c9d2340b26f7995b4afbf8787b",
+                "url": "https://api.github.com/repos/sebastianbergmann/php-code-coverage/zipball/f7bb5cddf4ffe113eeb737b05241adb947b43f9d",
+                "reference": "f7bb5cddf4ffe113eeb737b05241adb947b43f9d",
                 "shasum": ""
             },
             "require": {
@@ -470,7 +514,7 @@
                 "testing",
                 "xunit"
             ],
-            "time": "2015-10-06 15:51:05"
+            "time": "2015-11-12 21:08:20"
         },
         {
             "name": "phpunit/php-file-iterator",
@@ -652,16 +696,16 @@
         },
         {
             "name": "phpunit/phpunit",
-            "version": "5.0.8",
+            "version": "5.0.9",
             "source": {
                 "type": "git",
                 "url": "https://github.com/sebastianbergmann/phpunit.git",
-                "reference": "97fb2503cf8caca9d768fde3cca2ab147b9e7030"
+                "reference": "ed084be6b5b912f11c3559e17110f8d8a1e3a8a1"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/sebastianbergmann/phpunit/zipball/97fb2503cf8caca9d768fde3cca2ab147b9e7030",
-                "reference": "97fb2503cf8caca9d768fde3cca2ab147b9e7030",
+                "url": "https://api.github.com/repos/sebastianbergmann/phpunit/zipball/ed084be6b5b912f11c3559e17110f8d8a1e3a8a1",
+                "reference": "ed084be6b5b912f11c3559e17110f8d8a1e3a8a1",
                 "shasum": ""
             },
             "require": {
@@ -722,20 +766,20 @@
                 "testing",
                 "xunit"
             ],
-            "time": "2015-10-23 06:50:01"
+            "time": "2015-11-10 21:47:43"
         },
         {
             "name": "phpunit/phpunit-mock-objects",
-            "version": "3.0.3",
+            "version": "3.0.4",
             "source": {
                 "type": "git",
                 "url": "https://github.com/sebastianbergmann/phpunit-mock-objects.git",
-                "reference": "382c729a52b7ef682e94c73fd6868f5ee8116ba7"
+                "reference": "b28b029356e65091dfbf8c2bc4ef106ffece509e"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/sebastianbergmann/phpunit-mock-objects/zipball/382c729a52b7ef682e94c73fd6868f5ee8116ba7",
-                "reference": "382c729a52b7ef682e94c73fd6868f5ee8116ba7",
+                "url": "https://api.github.com/repos/sebastianbergmann/phpunit-mock-objects/zipball/b28b029356e65091dfbf8c2bc4ef106ffece509e",
+                "reference": "b28b029356e65091dfbf8c2bc4ef106ffece509e",
                 "shasum": ""
             },
             "require": {
@@ -778,7 +822,7 @@
                 "mock",
                 "xunit"
             ],
-            "time": "2015-10-18 07:55:54"
+            "time": "2015-11-09 15:37:17"
         },
         {
             "name": "sebastian/comparator",
@@ -1242,9 +1286,7 @@
     ],
     "aliases": [],
     "minimum-stability": "alpha",
-    "stability-flags": {
-        "marando/astrocoord": 20
-    },
+    "stability-flags": [],
     "prefer-stable": true,
     "prefer-lowest": false,
     "platform": [],

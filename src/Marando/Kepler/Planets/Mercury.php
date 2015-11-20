@@ -24,8 +24,11 @@ use \Marando\JPLephem\DE\SSObj;
 
 class Mercury extends SolarSystObj {
 
-  protected function getJPLObj() {
+  protected function getSSObj() {
     return SSObj::Mercury();
+  }
+  protected function getJPLObj() {
+
   }
 
   protected function getPhysicalDiameter() {
