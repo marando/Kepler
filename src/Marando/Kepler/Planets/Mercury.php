@@ -20,19 +20,34 @@
 
 namespace Marando\Kepler\Planets;
 
+use \Exception;
+use \Marando\AstroDate\AstroDate;
+use \Marando\AstroDate\Epoch;
 use \Marando\JPLephem\DE\SSObj;
+use \Marando\Kepler\Orbitals;
+use \Marando\Units\Angle;
+use \Marando\Units\Distance;
 
 class Mercury extends SolarSystObj {
 
   protected function getSSObj() {
     return SSObj::Mercury();
   }
+
   protected function getJPLObj() {
 
   }
 
   protected function getPhysicalDiameter() {
-    return \Marando\Units\Distance::km(4879);
+    return Distance::km(4879);
+  }
+
+  ///////
+  ///////  below this should be in trait
+
+
+  public static function orbitals(AstroDate $dt = null) {
+    return Orbitals::Mercury($dt);
   }
 
 }

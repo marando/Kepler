@@ -336,12 +336,12 @@ class Ephemeris implements ArrayAccess, Iterator {
     $geod = " ({$this[0]->obsrv})";
     $str  = <<<HEADER
 
-============================================================================================
+==================================================================================
  TARGET: {$this[0]->target}
  CENTER: {$this[0]->center}{$geod}
---------------------------------------------------------------------------------------------
-        Date & Time         |        Apparent R.A. & Dec        |     Apparent Alt & Az
-----------------------------|-----------------------------------|---------------------------
+----------------------------------------------------------------------------------
+Date & Time                 | Apparent RA  | Apparent Decl | Alt       | Az
+----------------------------|--------------|---------------|-----------|----------
 
 HEADER;
 
@@ -351,13 +351,16 @@ HEADER;
       $dist = $dist->au < 1 ? $dist->setUnit('km') : $dist;
 
       $str .= $e->date->format('Y-M-d h:i:s A T');
-      $str .= " | {$e->radecApparent->format('α RhʰRmᵐRsˢ.Ru, δ +Dd°Dm\'Ds".Du')}";
-      $str .= " | {$e->altaz->format('h +H°, \A A°')}";
+      //$str .= " | {$e->radecApparent->format('α RhʰRmᵐRsˢ.Ru, δ +Dd°Dm\'Ds".Du')}";
+      //$str .= " | {$e->altaz->format('h +H°, \A A°')}";
+
+      $str .= " | {$e->radecApparent->format('Rh Rm Rs.Ru | +Dd Dm Ds.Du')}";
+      $str .= " | {$e->altaz->format('+H | A')}";
 
       $str .= "\n";
     }
 
-    $str .= str_repeat('=', 92);
+    $str .= str_repeat('=', 82);
     return $str;
   }
 

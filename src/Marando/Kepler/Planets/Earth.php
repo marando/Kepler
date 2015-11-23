@@ -41,7 +41,7 @@ class Earth extends SolarSystObj {
     return Distance::km(12756);
   }
 
-  public function planetary(AstroDate $date = null, $string = false) {
+  public static function planets(AstroDate $date = null, $string = false) {
     // if string = false return as array otherwise print below
 
 
@@ -71,15 +71,18 @@ Planet  | Apparent RA  | Apparent Decl | Dist, AU
 
 STR;
     $jdTDB  = $date->toTDB()->toJD();
-    $reader = $this->reader->jde($jdTDB);
+    $reader = (new \Marando\JPLephem\DE\Reader())->jde($jdTDB);
+    //$reader = new \Marando\JPLephem\DE\Reader(\Marando\JPLephem\DE\DE::DE430());
+    //$reader->jde($jdTDB);
     foreach ($planets as $p) {
 
-      $pv = $reader->observe($p, $this->getSSObj());
+      $pv = $reader->observe($p, SSObj::Earth());
 
-      $x  = Distance::au($pv[0]);
-      $y  = Distance::au($pv[1]);
-      $z  = Distance::au($pv[2]);
-      $c  = new Cartesian(Frame::ICRF(), $date->toEpoch(), $x, $y, $z);
+      $x = Distance::au($pv[0]);
+      $y = Distance::au($pv[1]);
+      $z = Distance::au($pv[2]);
+      $c = new Cartesian(Frame::ICRF(), $date->toEpoch(), $x, $y, $z);
+
       $eq = $c->toEquat()->apparent();
 
       $p   = str_pad($p, 7, ' ', STR_PAD_RIGHT);
@@ -91,5 +94,8 @@ STR;
     $str .= str_repeat('=', 49);
     return "$str\n";
   }
+
+
+
 
 }

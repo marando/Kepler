@@ -3,11 +3,13 @@
 namespace Marando\AstroCoord;
 
 use \Marando\AstroDate\AstroDate;
+use \Marando\AstroDate\TimeScale;
 use \Marando\AstroDate\TimeStandard;
 use \Marando\IAU\IAU;
 use \Marando\IAU\iauASTROM;
 use \Marando\JPLephem\DE\Reader;
 use \Marando\JPLephem\DE\SSObj;
+use \Marando\Kepler\Orbitals;
 use \Marando\Kepler\Planets\Earth;
 use \Marando\Kepler\Planets\Jupiter;
 use \Marando\Kepler\Planets\Mars;
@@ -30,18 +32,39 @@ use \PHPUnit_Framework_TestCase;
  */
 class GenericTest extends PHPUnit_Framework_TestCase {
 
+  public function testOrbitals() {
+
+    //$elem = Mercury::orbitals(AstroDate::parse('1500-Nov-08 23:20:34'));
+
+    //echo Mercury::orbitals();
+    echo $J = Orbitals::Jupiter(AstroDate::jd(2451545, TimeScale::TT()));
+
+
+    //Mercury::orbitals(AstroDate::create(2900, 1, 1));
+  }
+
   public function test() {
 
-    $e = new Earth();
+    return;
+
+
+
+    // Mercury | 15 51 49.711 | -20 48 16.085 |  1.44960
+    // Mercury | 15 51 49.711 | -20 48 16.085 |  1.44960
+
+    echo Earth::planets(AstroDate::parse('2015-Nov-21 00:00:00 TT'));
+    return;
+
+    $e   = new Earth();
     $now = AstroDate::now('EST');
-            echo "\n".$now->sidereal('a', Angle::deg(-82));
-    //echo $e->planetary(AstroDate::parse('2016-Mar-20 00:00:00 TT'));
-    echo $e->planetary($now);
-    exit;
+    echo "\n" . $now->sidereal('a', Angle::deg(-82));
+
+    //echo $e->planetary($now);
+//exit;
 
 
     $now = AstroDate::now('EST');
-    $e->dateRange($now, $now->copy()->add(Time::days(1)), '1 Hours');
+    $e->dateRange($now, $now->copy()->add(Time::days(1)), '4 hours');
 
 
     //$e->dateRange('1990-nov-01', '2040-nov-01', '365.25 days');
@@ -49,7 +72,7 @@ class GenericTest extends PHPUnit_Framework_TestCase {
     $e->topo('27.9681 N', '82.4764 W');
 
     echo $ephem = $e->observe(new Mars);
-return;
+    return;
 
 /////add thing to show solar time or like:
 ////////Day / Twilights / astronom / civil etc...
