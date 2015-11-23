@@ -2,10 +2,10 @@
   "name": "marando/kepler",
   "description": "A PHP planetary ephemeris and general astronomy package",
   "require": {
-    "marando/astrodate": "^1.0",
+    "marando/astrodate": "^1.0.3",
     "marando/jplephem": "^1.0",
     "marando/units": "^0.3.3",
-    "marando/astrocoord": "^0.2"
+    "marando/astrocoord": "^0.2.4"
   },
   "require-dev": {
     "phpunit/phpunit": "^5.0"
