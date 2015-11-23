@@ -37,8 +37,9 @@ class GenericTest extends PHPUnit_Framework_TestCase {
     //$elem = Mercury::orbitals(AstroDate::parse('1500-Nov-08 23:20:34'));
 
     //echo Mercury::orbitals();
-    echo $J = Orbitals::Jupiter(AstroDate::jd(2451545, TimeScale::TT()));
+    //echo $j = Orbitals::Jupiter(AstroDate::jd(2451545, TimeScale::TT()));
 
+    echo Orbitals::planet(new Jupiter);
 
     //Mercury::orbitals(AstroDate::create(2900, 1, 1));
   }

@@ -31,22 +31,26 @@ use \Marando\Units\Distance;
  *
  * @property string   $bodyName Optional name for the body's name
  * @property Epoch    $epoch    Epoch of orbital elements
- * @property Distance $axis     Semi-major axis
- * @property float    $ecc      Eccentricity
- * @property Angle    $incl     Inclination
- * @property Angle    $meanLon  Mean longitude
- * @property Angle    $lonPeri  Longitude of perihelion
- * @property Angle    $argPeri  Argument of perihelion
- * @property Angle    $node     Longitude of the ascending node
- * @property Angle    $mAnomaly Mean anomaly
- * @property Angle    $eAnomaly Eccentric anomaly
+ * @property Distance $axis     Semi-major axis, a
+ * @property float    $ecc      Eccentricity, e
+ * @property Angle    $incl     Inclination, i
+ * @property Angle    $meanLon  Mean longitude, L
+ * @property Angle    $lonPeri  Longitude of perihelion, ϖ
+ * @property Angle    $argPeri  Argument of perihelion, ω
+ * @property Angle    $node     Longitude of the ascending node, Ω
+ * @property Angle    $mAnomaly Mean anomaly, M
+ * @property Angle    $eAnomaly Eccentric anomaly, E
  */
 class Orbitals {
-
   //----------------------------------------------------------------------------
   // Constructors
   //----------------------------------------------------------------------------
 
+  /**
+   * Kepleriam orbital elements for the planet Mercury
+   * @param  AstroDate $date
+   * @return static
+   */
   public static function Mercury(AstroDate $date = null) {
     $date = $date ? $date : AstroDate::now()->toTDB();
 
@@ -58,6 +62,11 @@ class Orbitals {
     return $Me;
   }
 
+  /**
+   * Kepleriam orbital elements for the planet Jupiter
+   * @param  AstroDate $date
+   * @return static
+   */
   public static function Jupiter(AstroDate $date = null) {
     $date = $date ? $date : AstroDate::now()->toTDB();
 
@@ -69,12 +78,16 @@ class Orbitals {
     return $J;
   }
 
+  public static function comet() {
+
+  }
+
   //----------------------------------------------------------------------------
   // Properties
   //----------------------------------------------------------------------------
 
   /**
-   *
+   * Epoch of orbital elements
    * @var Epoch
    */
   protected $epoch;
@@ -120,6 +133,11 @@ class Orbitals {
    * @var Angle
    */
   protected $node;
+
+  /**
+   * JPL data for determining orbital elements for planet of this instance
+   * @var array
+   */
   protected $jplData;
 
   public function __get($name) {
@@ -179,11 +197,18 @@ class Orbitals {
   // Functions
   //----------------------------------------------------------------------------
 
+  /**
+   * Initializes this instance with the orbital elements of a planet
+   * @param  int       $i Planet number, 1=Mercury, 9=Pluto
+   * @throws Exception    Occurs if the date is out of range
+   */
   protected function initPlanet($i) {
+    // Date values
     $dataJPL = static::dataJPL($i);
     $year    = $this->epoch->toDate()->year;
     $T       = ($this->epoch->jd - 2451545.0) / Epoch::DaysJulianYear;
 
+    // Check date and determine year class
     if ($year <= 2050 && $year >= 1800)
       $yearClass = 0;
     else if ($year <= 3000 && $year >= -3000)
@@ -192,11 +217,13 @@ class Orbitals {
       throw new Exception("Orbital elements can only be calculated for dates"
       . "between 3000 BC and 3000 AD");
 
+    // Calculate each orbital element
     $elem = [];
     foreach ($dataJPL[0] as $el => $data) {
       $elem[$el] = $data[$yearClass][0] + $data[$yearClass][1] * $T;
     }
 
+    // Populate data
     $this->jplData = $dataJPL;
     $this->axis    = Distance::au($elem['a']);
     $this->ecc     = $elem['e'];
@@ -204,37 +231,77 @@ class Orbitals {
     $this->meanLon = Angle::deg($elem['L'])->norm();
     $this->lonPeri = Angle::deg($elem['ϖ']);
     $this->node    = Angle::deg($elem['Ω']);
+
+    return;
   }
 
+  /**
+   * Calculates the M, the mean anomaly for this instance
+   * @return Angle
+   */
   protected function calcMeanAnomaly() {
+    // Required values
     $y = $this->epoch->toDate()->year;
     $L = $this->meanLon->deg;
     $ϖ = $this->argPeri->deg;
+
+    // Initial computation of M
     $M = $L - $ϖ;
 
+    // If year is outside of 1800-2050, add extra JPL terms
     if ($y <= 2050 && $y >= 1800) {
+      // Check if extra terms of Jupiter to Pluto exist for this instance
       if ($this->jplData[1] != null) {
-        // Extra terms of Jupiter to Pluto
+        // Time variable
+        $T = ($this->epoch->jd - 2451545.0) / Epoch::DaysJulianYear;
+
+        // Extra terms
         $b = $this->jplData[1]['b'];
         $c = $this->jplData[1]['c'];
         $s = $this->jplData[1]['s'];
         $f = $this->jplData[1]['f'];
-        $T = ($this->epoch->jd - 2451545.0) / Epoch::DaysJulianYear;
 
+        // Additions to M based on terms (see JPL documentation)
         $M += $b * ($T * $T) + $c * cos($f * $T) + $s * sin($f * $T);
       }
     }
 
+    // Normalize angle
     return Angle::deg($M)->norm(-180, 180);
   }
 
+  /**
+   * Finds the eccentric anomaly of this instance via iteration
+   * @return Angle
+   */
   protected function calcEccentricAnomaly() {
+    $M  = $this->mAnomaly->deg;
+    $e  = $this->ecc;
+    $ΔE = PHP_INT_MAX;
 
+    // Iterate to find E
+    $E0 = $M + $e * sin($M);
+    while ($ΔE > 0) {
+      $ΔM = $M - ($E0 - $e * sin($E0));
+      $ΔE = $ΔM / (1 - $e * cos($E0));
+      $E0 = $E0 + $ΔE;
+    }
+
+    return Angle::deg($E0);
   }
 
+  /**
+   * Gets the JPL terms and rates for determining the orbital elements of a
+   * provided planet
+   *
+   * @param  int   $planet Planet number, 1=Mercury, 9=Pluto
+   * @return array
+   */
   protected static function dataJPL($planet) {
     $data = [
+        // Mercury
         1 => [
+            //      1800-2050                 -3000 to 3000
             'a' => [[0.38709927, 0.00000037], [0.38709843, 0.00000000]],
             'e' => [[0.20563593, 0.00001906]],
             'i' => [[7.00497902, -0.00594749]],
@@ -242,7 +309,9 @@ class Orbitals {
             'ϖ' => [[77.45779628, 0.16047689]],
             'Ω' => [[48.33076593, -0.12534081]],
         ],
+        // Jupiter
         5 => [
+            //      1800-2050                  -3000 to 3000
             'a' => [[5.20288700, -0.00011607], [ 5.20248019, -0.00002864]],
             'e' => [[0.04838624, -0.00013253], [ 0.04853590, 0.00018026]],
             'i' => [[1.30439695, -0.00183714], [ 1.29861416, -0.00322699]],
@@ -252,17 +321,20 @@ class Orbitals {
         ],
     ];
 
+    // Additional terms required for computation of M
     $terms = [
         1 => 0,
         2 => 0,
         3 => 0,
         4 => 0,
+        // Jupiter
         5 => [
             'b' => -0.00012452,
             'c' => 0.06064060,
             's' => -0.35635438,
             'f' => 38.35125000,
         ],
+        // Saturn
         6 => [
             'b' => 0.00025899,
             'c' => -0.13434469,
@@ -271,11 +343,16 @@ class Orbitals {
         ],
     ];
 
+    // Return array of terms
     return [$data[$planet], $terms[$planet]];
   }
 
   // // // Overrides
 
+  /**
+   * Represents this instance as a string
+   * @return string
+   */
   public function __toString() {
     $fmt = '% 9.5f';
 
@@ -287,6 +364,7 @@ class Orbitals {
     $ω = sprintf($fmt, $this->argPeri->deg);
     $Ω = sprintf($fmt, $this->node->deg);
     $M = sprintf($fmt, $this->mAnomaly->deg);
+    $E = sprintf($fmt, $this->eAnomaly->deg);
 
     if ($this->bodyName)
       $title = "Orbital Elements of {$this->bodyName}\nEpoch {$this->epoch}";
@@ -305,6 +383,7 @@ L = {$L}°
 ω = {$ω}°
 Ω = {$Ω}°
 M = {$M}°
+E = {$E}°
 
 ELEM;
   }
