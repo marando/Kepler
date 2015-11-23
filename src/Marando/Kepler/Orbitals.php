@@ -40,6 +40,8 @@ use \Marando\Units\Distance;
  * @property Angle    $node     Longitude of the ascending node, Ω
  * @property Angle    $mAnomaly Mean anomaly, M
  * @property Angle    $eAnomaly Eccentric anomaly, E
+ *
+ * @property Distance $axisMin  Semi-minor axis, b
  */
 class Orbitals {
   //----------------------------------------------------------------------------
@@ -157,6 +159,9 @@ class Orbitals {
 
       case 'eAnomaly':
         return $this->calcEccentricAnomaly();
+
+      case 'axisMin':
+        return $this->calcSemiMinAxis();
     }
   }
 
@@ -291,6 +296,20 @@ class Orbitals {
   }
 
   /**
+   * Calculates the semi-minor axis of this instance
+   * @return Distance
+   */
+  public function calcSemiMinAxis() {
+    $a = $this->axis->au;
+    $e = $this->ecc;
+
+    $b = $a * sqrt(1 - $e * $e);
+    return Distance::au($b);
+  }
+
+  // // // Static
+
+  /**
    * Gets the JPL terms and rates for determining the orbital elements of a
    * provided planet
    *
@@ -354,8 +373,10 @@ class Orbitals {
    * @return string
    */
   public function __toString() {
+    // sprintf format
     $fmt = '% 9.5f';
 
+    // Format elements
     $a = sprintf($fmt, $this->axis->au);
     $e = sprintf($fmt, $this->ecc);
     $i = sprintf($fmt, $this->incl->deg);
@@ -366,13 +387,14 @@ class Orbitals {
     $M = sprintf($fmt, $this->mAnomaly->deg);
     $E = sprintf($fmt, $this->eAnomaly->deg);
 
+    // Format title
     if ($this->bodyName)
       $title = "Orbital Elements of {$this->bodyName}\nEpoch {$this->epoch}";
     else
       $title = "Orbital Elements\nEpoch {$this->epoch}";
 
-    return <<<ELEM
-
+    // Generate string
+    $str = <<<ELEM
 {$title}
  * * *
 a = {$a} AU
@@ -384,8 +406,9 @@ L = {$L}°
 Ω = {$Ω}°
 M = {$M}°
 E = {$E}°
-
 ELEM;
+
+    return "\n$str\n";
   }
 
 }
