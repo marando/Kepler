@@ -21,10 +21,18 @@
 namespace Marando\Kepler;
 
 use \InvalidArgumentException;
+use \Marando\AstroCoord\Cartesian;
+use \Marando\AstroCoord\Equat;
+use \Marando\AstroCoord\Frame;
 use \Marando\AstroDate\AstroDate;
 use \Marando\AstroDate\Epoch;
+use \Marando\IAU\IAU;
+use \Marando\JPLephem\DE\Reader;
+use \Marando\JPLephem\DE\SSObj;
+use \Marando\Kepler\JPL\SmallBodyData;
 use \Marando\Units\Angle;
 use \Marando\Units\Distance;
+use \Marando\Units\Time;
 
 /**
  * Represents Keplerian orbital elements
@@ -47,8 +55,12 @@ use \Marando\Units\Distance;
  * @property Distance  $periDist Perihelion distance
  * @property Distance  $apheDist Aphelion distance
  * @property Time      $period   Orbital period
+ * @property Angle     $tAnomaly True anomaly, υ
  */
 class Orbitals {
+
+  use \Marando\Units\Traits\CopyTrait;
+
   //----------------------------------------------------------------------------
   // Constructors
   //----------------------------------------------------------------------------
@@ -94,7 +106,7 @@ class Orbitals {
    * @return static
    */
   public static function search($name, $bodyType = null) {
-    return JPL\SmallBodyData::find($name);
+    return SmallBodyData::find($name);
   }
 
   public static function comet(Epoch $epoch, Distance $q, $e, Angle $i,
@@ -239,6 +251,12 @@ class Orbitals {
 
       case 'period':
         return $this->perihelion(0)->diff($this->perihelion(1))->setUnit('day');
+
+      case 'tAnomaly':
+        return $this->calcTrueAnomaly();
+
+      default:
+        throw new \Exception("Undefined property '{$name}'");
     }
   }
 
@@ -279,16 +297,68 @@ class Orbitals {
   // Functions
   //----------------------------------------------------------------------------
 
-  public function toEclip($date = null) {
-    $date = $date ? $date : $this->epoch->toDate();
+  public function toEquat(AstroDate $date = null, &$lt = null) {
+    $dt = $date ? $date : $this->epoch->toDate();
 
-    // Find ecliptic coordinates of instance
+    $ε = IAU::Obl06($dt->toTT()->toJD(), 0);
+    $Ω = $this->node->rad;
+    $i = $this->incl->rad;
+    $q = $this->periDist->au;
+    $ω = $this->argPeri->rad;
+
+    // Astronomical Algorithms (J. Meeus), p.228
+    $F = cos($Ω);
+    $G = sin($Ω) * cos($ε);
+    $H = sin($Ω) * sin($ε);
+    $P = -sin($Ω) * cos($i);
+    $Q = cos($Ω) * cos($i) * cos($ε) - sin($i) * sin($ε);
+    $R = cos($Ω) * cos($i) * sin($ε) + sin($i) * cos($ε);
+
+    $A = atan2($F, $P);
+    $B = atan2($G, $Q);
+    $C = atan2($H, $R);
+    $a = sqrt($F * $F + $P * $P);
+    $b = sqrt($G * $G + $Q * $Q);
+    $c = sqrt($H * $H + $R * $R);
+
+    if ($this->type == 'comet') {
+
+      $τT = $dt->toJD() - $this->datePeri->toJD();
+      $W  = (0.03649116245 / ($q * sqrt($q))) * $τT;
+
+      // find s
+      $G = $W / 2;
+      $Y = pow($G + sqrt($G * $G + 1), 1 / 3);
+      $s = $Y - 1 / $Y;
+
+      // Find true anomaly and radius vector (not affected for light time)
+      $ν = 2 * atan($s);
+      $r = $q * (1 + $s * $s);
+
+      // Position of comet
+      $x = $r * $a * sin($A + $ω + $ν);
+      $y = $r * $b * sin($B + $ω + $ν);
+      $z = $r * $c * sin($C + $ω + $ν);
+
+      // Position of sun
+      $de    = (new Reader())->jde($dt->toJD());
+      $pvSun = $de->position(SSObj::Sun(), SSObj::Earth());
+
+      // Find Geocentric RA/Decl and distance
+      $ξ = $pvSun[0] + $x;
+      $η = $pvSun[1] + $y;
+      $ζ = $pvSun[2] + $z;
+      $α = Angle::atan2($η, $ξ)->norm()->toTime();
+      $Δ = Distance::au(sqrt($ξ * $ξ + $η * $η + $ζ * $ζ));
+      $δ = Angle::rad($ζ / $Δ->au);
+
+      return new Equat(Frame::ICRF(), $dt->toEpoch(), $α, $δ, $Δ);
+    }
   }
 
-  public function toEquat($date = null) {
-    $date = $date ? $date : $this->epoch->toDate();
-
-    // Find equatorial coordinates of instance
+  public function toEclip($date = null, $lt = null) {
+    //$ε = Angle::rad(IAU::Obl06($date->toTT()->toJD(), 0));
+    //return $this->toEquat($date, $lt)->toEclip($ε);
   }
 
   // // // Protected
@@ -371,7 +441,7 @@ class Orbitals {
    * @return Angle
    */
   protected function calcEccentricAnomaly() {
-    $M  = $this->mAnomaly->deg;
+    $M  = $this->mAnomaly->rad;
     $e  = $this->ecc;
     $ΔE = PHP_INT_MAX;
 
@@ -383,19 +453,27 @@ class Orbitals {
       $E0 = $E0 + $ΔE;
     }
 
-    return Angle::deg($E0);
+    return Angle::deg($E0)->norm();
   }
 
   /**
    * Calculates the semi-minor axis of this instance
    * @return Distance
    */
-  public function calcSemiMinAxis() {
+  protected function calcSemiMinAxis() {
     $a = $this->axis->au;
     $e = $this->ecc;
 
     $b = $a * sqrt(1 - $e * $e);
     return Distance::au($b);
+  }
+
+  protected function calcTrueAnomaly() {
+    $E = $this->eAnomaly->deg;
+    $e = $this->ecc;
+
+    $cosv = (cos($E) - $e) / (1 - $e * cos($E));
+    return Angle::rad(acos($cosv));
   }
 
   // // // Static
@@ -545,10 +623,13 @@ ELEM;
     $T  = sprintf($fmt, $this->period->days / Epoch::DaysJulianYear);
     $n  = sprintf($fmt, $this->mMotion->deg);
 
+    echo "v = " . $this->tAnomaly->deg;
+
     // Generate string
     $str = <<<ELEM
 ====================================================
 Comet {$this->bodyName}
+Epoch {$this->epoch}
 ----------------------------------------------------
 Orbital Eccentricity    | {$e}
 Orbital Inclination     | {$i}°
@@ -562,7 +643,7 @@ Argument of Perihelion  | {$ω}°
 Ascending node          | {$Ω}°
 Mean anomaly            | {$M}°
 Mean motion             | {$n}°/day
-
+====================================================
 ELEM;
 
     return "\n$str\n";

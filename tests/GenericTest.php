@@ -35,8 +35,10 @@ class GenericTest extends PHPUnit_Framework_TestCase {
   public function testOrbitals() {
 
 
-    echo $lj = Orbitals::search('lovejoy');
+    echo $lj = Orbitals::search('C/2014 Q2');
 
+    echo "\n" . $lj->toEclip(AstroDate::jd(2457351.472615740, TimeScale::TDB()));
+    echo "\n" . $lj->toEquat(AstroDate::jd(2457351.472615740, TimeScale::TDB()))->format(Equat::FORMAT_FULL);
 
 
     return;
@@ -51,7 +53,7 @@ class GenericTest extends PHPUnit_Framework_TestCase {
 
   public function test() {
 
-
+    return;
 
 
 
