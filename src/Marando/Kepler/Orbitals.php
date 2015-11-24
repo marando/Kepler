@@ -29,19 +29,24 @@ use \Marando\Units\Distance;
 /**
  * Represents Keplerian orbital elements
  *
- * @property string   $bodyName Optional name for the body's name
- * @property Epoch    $epoch    Epoch of orbital elements
- * @property Distance $axis     Semi-major axis, a
- * @property float    $ecc      Eccentricity, e
- * @property Angle    $incl     Inclination, i
- * @property Angle    $meanLon  Mean longitude, L
- * @property Angle    $lonPeri  Longitude of perihelion, ϖ
- * @property Angle    $argPeri  Argument of perihelion, ω
- * @property Angle    $node     Longitude of the ascending node, Ω
- * @property Angle    $mAnomaly Mean anomaly, M
- * @property Angle    $eAnomaly Eccentric anomaly, E
+ * @property string    $bodyName Optional name for the body's name
+ * @property Epoch     $epoch    Epoch of orbital elements
+ * @property Distance  $axis     Semi-major axis, a
+ * @property float     $ecc      Eccentricity, e
+ * @property Angle     $incl     Inclination, i
+ * @property Angle     $meanLon  Mean longitude, L
+ * @property Angle     $lonPeri  Longitude of perihelion, ϖ
+ * @property Angle     $node     Longitude of the ascending node, Ω
+ * @property Angle     $mAnomaly Mean anomaly, M
+ * @property Angle     $eAnomaly Eccentric anomaly, E
  *
- * @property Distance $axisMin  Semi-minor axis, b
+ * @property Angle     $argPeri  Argument of perihelion, ω
+ * @property Distance  $axisMin  Semi-minor axis, b
+ * @property Angle     $mMotion  Mean motion, n in degrees per day
+ * @property AstroDate $datePeri Date of perihelion transit, Tp
+ * @property Distance  $periDist Perihelion distance
+ * @property Distance  $apheDist Aphelion distance
+ * @property Time      $period   Orbital period
  */
 class Orbitals {
   //----------------------------------------------------------------------------
@@ -52,6 +57,7 @@ class Orbitals {
    * Kepleriam orbital elements for the planet Mercury
    * @param  AstroDate $date
    * @return static
+   * @see    http://ssd.jpl.nasa.gov/?planet_pos
    */
   public static function Mercury(AstroDate $date = null) {
     $date = $date ? $date : AstroDate::now()->toTDB();
@@ -68,6 +74,7 @@ class Orbitals {
    * Kepleriam orbital elements for the planet Jupiter
    * @param  AstroDate $date
    * @return static
+   * @see    http://ssd.jpl.nasa.gov/?planet_pos
    */
   public static function Jupiter(AstroDate $date = null) {
     $date = $date ? $date : AstroDate::now()->toTDB();
@@ -80,8 +87,55 @@ class Orbitals {
     return $J;
   }
 
-  public static function comet() {
+  /**
+   *
+   * @param type $name
+   * @param type $bodyType
+   * @return static
+   */
+  public static function search($name, $bodyType = null) {
+    return JPL\SmallBodyData::find($name);
+  }
 
+  public static function comet(Epoch $epoch, Distance $q, $e, Angle $i,
+          Angle $w, Angle $node, AstroDate $tp, $name = '') {
+
+    // Set provided properties
+    $comet           = new Orbitals();
+    $comet->type     = 'comet';
+    $comet->epoch    = $epoch;
+    $comet->bodyName = $name;
+    $comet->ecc      = $e;
+    $comet->incl     = $i;
+    $comet->node     = $node;
+    $comet->datePeri = $tp;
+
+    // Calculate longitude of perihelion and semi-major axis
+    $comet->lonPeri = $node->copy()->add($w);
+    $comet->axis    = Distance::au($q->au / (1 - $e));
+
+    // Calculate time of since perihelion passage and mean anomaly
+    $sincePeri = $epoch->jd - $tp->toJD();
+    $mAnomaly  = Angle::deg($comet->mMotion->deg * $sincePeri);
+
+    // Calculate argument of perihelion and mean longitude
+    $comet->argPeri = $comet->lonPeri->copy()->subtract($comet->node);
+    $comet->meanLon = $comet->argPeri->copy()->add($mAnomaly);
+
+
+
+    return $comet;
+  }
+
+  public function perihelion($i = 0) {
+    $sincePeri = $this->epoch->jd - $this->datePeri->toJD();
+    $nextPeri  = $this->epoch->jd + ($i * 360 / $this->mMotion->deg) - $sincePeri;
+
+    return AstroDate::jd($nextPeri);
+  }
+
+  public static function asteroid($name) {
+    // search name or number
   }
 
   //----------------------------------------------------------------------------
@@ -142,13 +196,23 @@ class Orbitals {
    */
   protected $jplData;
 
+  /**
+   * Date of perihelion transit
+   * @var AstroDate
+   */
+  protected $datePeri;
+  protected $type = '';
+
   public function __get($name) {
     switch ($name) {
+      case 'epoch':
+      case 'bodyName':
       case 'axis':
       case 'ecc':
       case 'incl':
       case 'meanLon':
       case 'lonPeri':
+      case 'node':
         return $this->{$name};
 
       case 'argPeri':
@@ -162,6 +226,19 @@ class Orbitals {
 
       case 'axisMin':
         return $this->calcSemiMinAxis();
+
+      case 'mMotion':
+        $a = $this->axis->au;
+        return Angle::deg(0.9856076686 / ($a * sqrt($a)));
+
+      case 'periDist':
+        return Distance::au($this->axis->au * (1 - $this->ecc));
+
+      case 'apheDist':
+        return Distance::au($this->axis->au * (1 + $this->ecc));
+
+      case 'period':
+        return $this->perihelion(0)->diff($this->perihelion(1))->setUnit('day');
     }
   }
 
@@ -201,6 +278,20 @@ class Orbitals {
   //----------------------------------------------------------------------------
   // Functions
   //----------------------------------------------------------------------------
+
+  public function toEclip($date = null) {
+    $date = $date ? $date : $this->epoch->toDate();
+
+    // Find ecliptic coordinates of instance
+  }
+
+  public function toEquat($date = null) {
+    $date = $date ? $date : $this->epoch->toDate();
+
+    // Find equatorial coordinates of instance
+  }
+
+  // // // Protected
 
   /**
    * Initializes this instance with the orbital elements of a planet
@@ -322,11 +413,11 @@ class Orbitals {
         1 => [
             //      1800-2050                 -3000 to 3000
             'a' => [[0.38709927, 0.00000037], [0.38709843, 0.00000000]],
-            'e' => [[0.20563593, 0.00001906]],
-            'i' => [[7.00497902, -0.00594749]],
-            'L' => [[252.25032350, 149472.67411175]],
-            'ϖ' => [[77.45779628, 0.16047689]],
-            'Ω' => [[48.33076593, -0.12534081]],
+            'e' => [[0.20563593, 0.00001906], [0.20563661, 0.00002123]],
+            'i' => [[7.00497902, -0.00594749], [7.00559432, -0.00590158]],
+            'L' => [[252.25032350, 149472.67411175], [252.25166724, 149472.67486623]],
+            'ϖ' => [[77.45779628, 0.16047689], [77.45771895, 0.15940013]],
+            'Ω' => [[48.33076593, -0.12534081], [48.33961819, -0.12214182]],
         ],
         // Jupiter
         5 => [
@@ -360,6 +451,27 @@ class Orbitals {
             's' => 0.87320147,
             'f' => 38.35125000,
         ],
+        // Uranus
+        7 => [
+            'b' => 0.00058331,
+            'c' => -0.97731848,
+            's' => 0.17689245,
+            'f' => 7.67025000,
+        ],
+        // Neptune
+        8 => [
+            'b' => -0.00041348,
+            'c' => 0.68346318,
+            's' => -0.10162547,
+            'f' => 7.67025000,
+        ],
+        // Pluto
+        9 => [
+            'b' => -0.01262724,
+            'c' => 0,
+            's' => 0,
+            'f' => 0,
+        ],
     ];
 
     // Return array of terms
@@ -373,8 +485,11 @@ class Orbitals {
    * @return string
    */
   public function __toString() {
+    if ($this->type == 'comet')
+      return $this->formatComet();
+
     // sprintf format
-    $fmt = '% 9.5f';
+    $fmt = '%+ 10.5f';
 
     // Format elements
     $a = sprintf($fmt, $this->axis->au);
@@ -389,9 +504,9 @@ class Orbitals {
 
     // Format title
     if ($this->bodyName)
-      $title = "Orbital Elements of {$this->bodyName}\nEpoch {$this->epoch}";
+      $title = "{$this->bodyName}\nEpoch {$this->epoch} (JD {$this->epoch->jd})";
     else
-      $title = "Orbital Elements\nEpoch {$this->epoch}";
+      $title = "Orbital Elements\nEpoch {$this->epoch} (JD {$this->epoch->jd})";
 
     // Generate string
     $str = <<<ELEM
@@ -406,6 +521,48 @@ L = {$L}°
 Ω = {$Ω}°
 M = {$M}°
 E = {$E}°
+ELEM;
+
+    return "\n$str\n";
+  }
+
+  protected function formatComet() {
+    // sprintf format
+    $fmt = '% 14.8f';
+
+    // Format elements
+    $a  = sprintf($fmt, $this->axis->au);
+    $e  = sprintf($fmt, $this->ecc);
+    $i  = sprintf($fmt, $this->incl->deg);
+    $L  = sprintf($fmt, $this->meanLon->deg);
+    $ϖ  = sprintf($fmt, $this->lonPeri->deg);
+    $ω  = sprintf($fmt, $this->argPeri->deg);
+    $Ω  = sprintf($fmt, $this->node->deg);
+    $M  = sprintf($fmt, $this->mAnomaly->deg);
+    $E  = sprintf($fmt, $this->eAnomaly->deg);
+    $q  = sprintf($fmt, $this->periDist->au);
+    $ap = sprintf($fmt, $this->apheDist->au);
+    $T  = sprintf($fmt, $this->period->days / Epoch::DaysJulianYear);
+    $n  = sprintf($fmt, $this->mMotion->deg);
+
+    // Generate string
+    $str = <<<ELEM
+====================================================
+Comet {$this->bodyName}
+----------------------------------------------------
+Orbital Eccentricity    | {$e}
+Orbital Inclination     | {$i}°
+Perihelion distance     | {$q} AU
+Aphelion distance       | {$ap} AU
+Semi-major axis         | {$a} AU
+Orbital period          | {$T} years
+Perihelion Transit      | {$this->datePeri->format('Y-M-d H:i:s.u')}
+Next Perihelion Transit | {$this->perihelion(1)->format('Y-M-d H:i:s.u')}
+Argument of Perihelion  | {$ω}°
+Ascending node          | {$Ω}°
+Mean anomaly            | {$M}°
+Mean motion             | {$n}°/day
+
 ELEM;
 
     return "\n$str\n";

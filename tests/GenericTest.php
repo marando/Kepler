@@ -34,7 +34,13 @@ class GenericTest extends PHPUnit_Framework_TestCase {
 
   public function testOrbitals() {
 
-    //$elem = Mercury::orbitals(AstroDate::parse('1500-Nov-08 23:20:34'));
+
+    echo $lj = Orbitals::search('lovejoy');
+
+
+
+    return;
+    echo $elem = Mercury::orbitals(AstroDate::parse('1500-Nov-08 23:20:34'));
 
     //echo Mercury::orbitals();
     echo $j = Orbitals::Jupiter(AstroDate::jd(2451545, TimeScale::TT()));
@@ -45,15 +51,14 @@ class GenericTest extends PHPUnit_Framework_TestCase {
 
   public function test() {
 
-    return;
+
 
 
 
     // Mercury | 15 51 49.711 | -20 48 16.085 |  1.44960
     // Mercury | 15 51 49.711 | -20 48 16.085 |  1.44960
 
-    echo Earth::planets(AstroDate::parse('2015-Nov-21 00:00:00 TT'));
-    return;
+    echo Earth::planets(AstroDate::now());
 
     $e   = new Earth();
     $now = AstroDate::now('EST');
@@ -71,7 +76,7 @@ class GenericTest extends PHPUnit_Framework_TestCase {
     //$e->dateRange(AstroDate::now(), AstroDate::now()->add(Time::days(365 * 2)),'5 days');
     $e->topo('27.9681 N', '82.4764 W');
 
-    echo $ephem = $e->observe(new Mars);
+    echo $ephem = $e->observe(new Jupiter);
     return;
 
 /////add thing to show solar time or like:
