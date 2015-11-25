@@ -43,7 +43,7 @@ class SmallBodyData {
   }
 
   public static function find($name) {
-    $find = new static($name);
+    $find   = new static($name);
     return $find->searchComet($name);
   }
 

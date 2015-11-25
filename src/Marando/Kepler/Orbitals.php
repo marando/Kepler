@@ -143,7 +143,10 @@ class Orbitals {
     $sincePeri = $this->epoch->jd - $this->datePeri->toJD();
     $nextPeri  = $this->epoch->jd + ($i * 360 / $this->mMotion->deg) - $sincePeri;
 
-    return AstroDate::jd($nextPeri);
+    if (is_nan($nextPeri))
+      return null;
+    else
+      return AstroDate::jd($nextPeri);
   }
 
   public static function asteroid($name) {
@@ -247,10 +250,16 @@ class Orbitals {
         return Distance::au($this->axis->au * (1 - $this->ecc));
 
       case 'apheDist':
-        return Distance::au($this->axis->au * (1 + $this->ecc));
+        if ($this->ecc <= 1)
+          return Distance::au($this->axis->au * (1 + $this->ecc));
+        else
+          return null;
 
       case 'period':
-        return $this->perihelion(0)->diff($this->perihelion(1))->setUnit('day');
+        if ($this->ecc <= 1)
+          return $this->perihelion(0)->diff($this->perihelion(1))->setUnit('day');
+        else
+          return null;
 
       case 'tAnomaly':
         return $this->calcTrueAnomaly();
@@ -564,7 +573,13 @@ class Orbitals {
    */
   public function __toString() {
     if ($this->type == 'comet')
-      return $this->formatComet();
+      try {
+        return $this->formatComet();
+      }
+      catch (\Exception $ex) {
+        return $ex->getTraceAsString();
+      }
+
 
     // sprintf format
     $fmt = '%+ 10.5f';
@@ -619,11 +634,12 @@ ELEM;
     $M  = sprintf($fmt, $this->mAnomaly->deg);
     $E  = sprintf($fmt, $this->eAnomaly->deg);
     $q  = sprintf($fmt, $this->periDist->au);
-    $ap = sprintf($fmt, $this->apheDist->au);
-    $T  = sprintf($fmt, $this->period->days / Epoch::DaysJulianYear);
+    $ap = $this->apheDist ? sprintf($fmt, $this->apheDist->au) : 'n/a';
+    $T  = $this->period ? sprintf($fmt, $this->period->days / 365.25) : 'n/a';
     $n  = sprintf($fmt, $this->mMotion->deg);
 
-    echo "v = " . $this->tAnomaly->deg;
+    $dP = $this->datePeri->format('Y-M-d H:i:s.u');
+    $nP = $this->ecc <= 1 ? $this->perihelion(1)->format('Y-M-d H:i:s.u') : 'n/a';
 
     // Generate string
     $str = <<<ELEM
@@ -637,8 +653,8 @@ Perihelion distance     | {$q} AU
 Aphelion distance       | {$ap} AU
 Semi-major axis         | {$a} AU
 Orbital period          | {$T} years
-Perihelion Transit      | {$this->datePeri->format('Y-M-d H:i:s.u')}
-Next Perihelion Transit | {$this->perihelion(1)->format('Y-M-d H:i:s.u')}
+Perihelion Transit      | {$dP}
+Next Perihelion Transit | {$nP}
 Argument of Perihelion  | {$ω}°
 Ascending node          | {$Ω}°
 Mean anomaly            | {$M}°
