@@ -53,6 +53,7 @@ class SmallBodyDB {
 
   protected function update() {
     // Check if within update hourly threshold
+    $d = $this->hoursSinceUpdate() ;
     if ($this->hoursSinceUpdate() < static::UPDATE_INTVL_H)
       return;
 
@@ -76,6 +77,7 @@ class SmallBodyDB {
       $this->log("Done updating.");
     }
     else {
+      $this->setUpdatedNow();
       $this->log("No update required.");
     }
   }
