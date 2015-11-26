@@ -1,0 +1,229 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<!-- saved from url=(0047)http://www.bogan.ca/orbits/kepler/orbteqtn.html -->
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <title>Equations for Elliptical, Parabolic, Hyperbolic Orbits</title>
+
+  
+<!--   15:24:31  (Created 25-Jan-2004.)  (C) Copyright 2004 -->
+<style type="text/css"></style></head><body style="color: rgb(255, 255, 255); background-color: rgb(128, 128, 128);">
+<h2>Relationships of the Geometry, Conservation of Energy and Momentum</h2>
+
+of an object in orbit about a central body with mass, M. <br>
+
+<b>G = gravitational constant =</b> 6.674x10<sup>-11</sup>N.m<sup>2</sup>/kg<sup>2</sup><br>
+
+A very fundamental constant in orbital mechanics is <b>k = MG<br>
+</b>
+<p>More convenient units to use in Solar System Dynamics are AU for
+distance and years for time<br>
+1 AU = 1.4960x10<sup>11</sup> metres<br>
+1 year = 3.1558x10<sup>7</sup> seconds
+</p>
+
+<p> <a href="http://www.bogan.ca/orbits/kepler/Orbit_Calculator.html"><br>
+</a>
+<table bgcolor="#404040" border="1" cellpadding="7">
+  <tbody>
+    <tr align="center">
+      <td><b>Central<br>
+Body</b></td>
+      <td><b>Mass</b></td>
+      <td><b>k = MG</b></td>
+    </tr>
+    <tr>
+      <td><b>Sun</b></td>
+      <td>M<sub>S</sub> = 1.9891x10<sup>30</sup> kg</td>
+      <td>1.3275x10<sup>20</sup> m<sup>3</sup>/s<sup>2</sup><br>
+39.487 AU<sup>3</sup>/yr<sup>2</sup><br>
+887.4 AU km<sup>2</sup>/s<sup>2</sup><br>
+      </td>
+    </tr>
+    <tr>
+      <td><b>Earth</b></td>
+      <td>5.974x10<sup>24</sup> kg<br>
+      <sup>1</sup>/<sub>332960</sub> M<sub>S</sub></td>
+      <td>3.987x10<sup>14</sup> m<sup>3</sup>/s<sup>2</sup><br>
+3.987x10<sup>5</sup> km<sup>3</sup>/s<sup>2</sup><br>
+0.00011860 AU<sup>3</sup>/yr<sup>2</sup></td>
+    </tr>
+    <tr>
+      <td><b>Jupiter</b></td>
+      <td>1.8987x10<sup>27</sup> kg<br>
+      <sup>1</sup>/<sub>1047</sub> M<sub>S</sub></td>
+      <td>1.2672x10<sup>17</sup> m<sup>3</sup>/s<sup>2</sup><br>
+	1.2672x10<sup>8</sup> km<sup>3</sup>/s<sup>2</sup><br>
+	0.05648 AU<sup>3</sup>/yr<sup>2</sup></td>
+    </tr>
+  </tbody>
+</table>
+</p>
+
+<p>The equations below enable one to determine the motion and timing of
+an object in orbit. The time for travel along an orbit can be determine
+by calcuation of the difference of the mean anamolies, <i>M</i>, of
+the two points. </p>
+
+<p>
+<table bgcolor="#404040" border="1" cellpadding="8">
+  <tbody>
+    <tr align="center">
+      <td><b>TYPE ORBIT</b></td>
+      <td><b>Circular</b><sub>[1]</sub></td>
+      <td><b>Elliptical</b></td>
+      <td><b>Parabolic</b><sub>[2]</sub></td>
+      <td><b>Hyperbolic</b></td>
+    </tr>
+    <tr>
+      <td><b>Eccentricity, e</b></td>
+      <td> e = 0</td>
+      <td>0 &lt; e &lt; 1</td>
+      <td>e = 1</td>
+      <td>e &gt; 1</td>
+    </tr>
+    <tr>
+      <td><b>Semi-major Axis, a</b></td>
+      <td>a &gt; 0</td>
+      <td>a &gt; 0</td>
+      <td>a = undefined<br>
+see peri-helion/-gee</td>
+      <td>a &lt; 0</td>
+    </tr>
+    <tr>
+      <td>Periapsis <br>
+Distance, q</td>
+      <td>q = a</td>
+      <td>q = a (1 - e)</td>
+      <td>q<br>
+defining parameter</td>
+      <td>q = a (1 - e)</td>
+    </tr>
+    <tr>
+      <td>Parameter, p<br>
+Semi-latus rectum</td>
+      <td>p = a</td>
+      <td>p = a(1-e<sup>2</sup>)</td>
+      <td>p = 2q</td>
+      <td>p = a(1-e<sup>2</sup>)</td>
+    </tr>
+    <tr>
+      <td>Total Energy, E</td>
+      <td>E = - k/2a</td>
+      <td>E = - k/2a</td>
+      <td>E = 0</td>
+      <td>E = -k/2a</td>
+    </tr>
+    <tr>
+      <td>Distance from<br>
+Central Body</td>
+      <td>r = a</td>
+      <td>r = p/[1 + e cos(θ)]</td>
+      <td>r = 2q/[1 + cos(θ)]</td>
+      <td>r = p/[1 + e cos(θ)]</td>
+    </tr>
+    <tr>
+      <td>Velocity, v<br>
+θ = angle from periapsis<br>
+(true anamoly)</td>
+      <td>v<sup>2</sup> = k(1/a)<br>
+v = constant</td>
+      <td>v<sup>2</sup> = k(2/r - 1/a)<br>
+v<sup>2</sup> = [k/p](1+e<sup>2</sup>-2 cos(θ))</td>
+      <td>v<sup>2</sup> = k(2/r)<br>
+v<sup>2</sup> = (k/q)[1 + cos(θ)]</td>
+      <td>v<sup>2</sup> = k(2/r - 1/a)<br>
+v<sup>2</sup> = [k/p](1+e<sup>2</sup>-2 cos(θ))</td>
+    </tr>
+    <tr>
+      <td>Angle of Velocity, φ<br>
+relative to the<br>
+perpendicular to<br>
+the radial direction</td>
+      <td>φ = 0</td>
+      <td>tan(φ) = <br>
+[e sin(θ)/(1 + e cos(θ))]</td>
+      <td>φ = θ/2</td>
+      <td>tan(φ) = <br>
+[e sin(θ)/(1 + e cos(θ))]<br>
+      <br>
+θ<sub>max</sub> = 1/cos(e)</td>
+    </tr>
+    <tr>
+      <td>Periapsis<br>
+Velocity, v<sub>q</sub></td>
+      <td>v<sub>q</sub> = [k/a]<sup>1/2</sup></td>
+      <td>v<sub>q</sub> = [(k/a)(1+e)/(1-e)]<sup>1/2</sup></td>
+      <td>v<sub>q</sub> = [2k/q]<sup>1/2</sup><br>
+This is the 'escape' velocity</td>
+      <td>v<sub>q</sub> = [(-k/a)(1+e)/(e-1)]<sup>1/2</sup></td>
+    </tr>
+    <tr>
+      <td>Areal Velocity, A</td>
+      <td>A = [ka]<sup>1/2</sup></td>
+      <td>A = [ka(1+e)/(1-e)]<sup>1/2</sup></td>
+      <td>A = [kq/2]<sup>1/2</sup></td>
+      <td>A = [-ka(1+e)/(e-1)]<sup>1/2</sup></td>
+    </tr>
+    <tr>
+      <td>Orbit Period, P</td>
+      <td>P = 2π[a<sup>3</sup>/k]<sup>1/2</sup></td>
+      <td>P = 2π[a<sup>3</sup>/k]<sup>1/2</sup></td>
+      <td>undefined</td>
+      <td>undefined</td>
+    </tr>
+    <tr>
+      <td>Eccentric<br>
+Anomaly, <i>E, D, F</i> <br>
+Units = radians</td>
+      <td><i>E</i> = θ</td>
+      <td align="right">[e + cos(θ)]<br>
+cos(<i>E</i>) = -------------------<br>
+[1 + e cos(θ)]</td>
+      <td><i>D</i> = tan(θ/2)</td>
+      <td align="right">[e + cos(θ)]<br>
+cosh(<i>F</i>) = ------------------<br>
+[1 + e cos(θ)]</td>
+    </tr>
+    <tr>
+      <td>Mean Anomaly, <i>M</i></td>
+      <td><i>M = E</i></td>
+      <td><i>M</i> = <i>E</i> - e sin(<i>E</i>)</td>
+      <td><i>M</i> = <i>D</i> +<i>D</i><sup>3</sup>/3</td>
+      <td><i>M</i> = e sinh(<i>F</i>) - <i>F</i></td>
+    </tr>
+    <tr>
+      <td>Time from Periapsis, t - t<sub>o</sub></td>
+      <td>t - t<sub>o</sub> = <i>M</i> P/(2π)<br>
+t-t<sub>o</sub> = [a<sup>3</sup>/k]<sup>1/2</sup> <i>M</i></td>
+      <td>t - t<sub>o</sub> = <i>M</i> P/(2π)<br>
+t-t<sub>o</sub> = [a<sup>3</sup>/k]<sup>1/2</sup> <i>M</i></td>
+      <td>t - t<sub>o</sub> = [2 q<sup>3</sup>/k]<sup>1/2</sup> <i>M</i></td>
+      <td>t - t<sub>o</sub> = [(-a)<sup>3</sup>/k]<sup>1/2</sup> <i>M</i></td>
+    </tr>
+  </tbody>
+</table>
+</p>
+
+<p>Note 1: Circular Orbits are a special case of Elliptical orbits<br>
+The relationships can be determined from
+the Elliptical orbit equations by subsituting:<br>
+r = a and e = 0. <br>
+I provide them here for comparison.
+</p>
+
+<p>Note 2: The Parabolic Orbit is very long stretched Elliptical Orbit
+and cannot be characterized by a semi-major axis or eccentricity. It is
+determined only by its periapsis distance from the central body. </p>
+
+<hr><b>Reference:</b> <i>"<u>Fundamentals of Astrodynamics</u>"</i> <br>
+
+by R.R.Bate, D.D.Mueller, and J.E. White<br>
+
+Dover Publications (1971)
+<p>Note: I have used a different definition for the Parabolic Eccentic
+Anamoly, D, than the standard references so that the Parabolic Mean
+Anamoly is dimensionless.
+</p>
+
+<hr><i>Larry Bogan<br>
+25 Jan, 2004</i>
+</body></html>

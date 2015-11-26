@@ -1,21 +1,26 @@
 {
-    "name": "marando/kepler",
-    "description": "AA PHP planetary, comet and asteroid ephemeris pacakage",
-    "require": {
-        "marando/astrodate": "^1.0.3",
-        "marando/jplephem": "^1.0",
-        "marando/astrocoord": "^0.2.4",
-        "marando/units": "^0.3.3",
-        "marando/php-sofa": "^0.2.5"
-    },
-    "require-dev": {
-        "phpunit/phpunit": "^5.0"
-    },
-    "license": "GNU2",
-    "authors": [
-        {
-            "name": "Ashley Marando",
-            "email": "a.marando@me.com"
-        }
-    ]
+  "name": "marando/kepler",
+  "description": "AA PHP planetary, comet and asteroid ephemeris pacakage",
+  "require": {
+    "marando/astrodate": "^1.0.3",
+    "marando/jplephem": "^1.0",
+    "marando/astrocoord": "^0.2.4",
+    "marando/units": "^0.3.3",
+    "marando/php-sofa": "^0.2.5"
+  },
+  "require-dev": {
+    "phpunit/phpunit": "^5.0"
+  },
+  "license": "GNU2",
+  "authors": [
+    {
+      "name": "Ashley Marando",
+      "email": "a.marando@me.com"
+    }
+  ],
+  "autoload": {
+    "psr-0": {
+      "Marando": "src/"
+    }
+  }
 }
