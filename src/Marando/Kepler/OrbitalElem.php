@@ -243,6 +243,9 @@ class OrbitalElem {
 
       case 'axisMin':
         return $this->calcAxisMin();
+
+      case 'r':
+        return $this->calcRadius();
     }
   }
 
@@ -300,6 +303,14 @@ class OrbitalElem {
 
   protected function calcMeanLong() {
     return $this->argPeri->copy()->add($this->meanAnomaly);
+  }
+
+  protected function calcRadius() {
+    $q = $this->periDist->au;
+    $e = $this->ecc;
+    $ν = $this->trueAnomaly->rad;
+
+    return Distance::au($q * (1 + $e) / (1 + $e * cos($ν)));
   }
 
   protected function calcMeanAnomaly() {
@@ -421,6 +432,7 @@ class OrbitalElem {
     $M = $e < 1 ? sprintf("{$fmt}°", $this->meanAnomaly->deg) : $na;
     $E = $e < 1 ? sprintf("{$fmt}°", $this->eccAnomaly->deg) : $na;
     $ν = sprintf($fmt, $this->trueAnomaly->deg);
+    $r = sprintf("{$fmt} AU", $this->r->au);
 
     $T = $na;
     if ($e < 1) {
@@ -462,6 +474,7 @@ Mean longitude          | {$L}°
 Mean anomaly            | {$M}
 Eccentric anomaly       | {$E}
 True anomaly            | {$ν}°
+Radius at epoch         | {$r}
 ====================================================
 
 STR;
