@@ -71,6 +71,7 @@ abstract class SolarSystObj {
     }
     else {
       echo "\n\n" . $p = $target->getPosition($date)->subtract($this->getPosition($date));
+      echo "\n\n" . $p->toEquat();
     }
   }
 

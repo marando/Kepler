@@ -32,19 +32,27 @@ class GenericTest extends PHPUnit_Framework_TestCase {
 
   public function test() {
 
+    $earth = new Earth();
+    $earth->observe(Comet::find('C/2015 W1'));
 
-    $epoch = Epoch::jd(2457346.500000000);
-    $a     = Distance::au(0.3870979732041467);
-    $e     = 0.2056309601529898;
-    $i     = Angle::deg(7.004037120062203);
-    $ϖ     = Angle::deg(77.4792716201);
-    $Ω     = Angle::deg(4.831084721343618E+01);
-    $L     = Angle::deg(233.9570580844);
-    echo OrbitalElem::planet($epoch, $a, $e, $i, $ϖ, $Ω, $L, 'Mercury');
 
+
+
+    return;
+    /*
+      $epoch = Epoch::jd(2457346.500000000);
+      $a     = Distance::au(0.3870979732041467);
+      $e     = 0.2056309601529898;
+      $i     = Angle::deg(7.004037120062203);
+      $ϖ     = Angle::deg(77.4792716201);
+      $Ω     = Angle::deg(4.831084721343618E+01);
+      $L     = Angle::deg(233.9570580844);
+      echo $m = OrbitalElem::planet($epoch, $a, $e, $i, $ϖ, $Ω, $L, 'Mercury');
+     *
+     */
 
     // Elliptic orbit
-    echo Comet::find('Halley');
+    echo $c = Comet::find('Halley');
 
     // Near parabolic
     echo Comet::find('C/2014 Q2');

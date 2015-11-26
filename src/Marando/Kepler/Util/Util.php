@@ -23,7 +23,10 @@ namespace Marando\Kepler\Util;
 use \Marando\AstroCoord\Cartesian;
 use \Marando\AstroCoord\Frame;
 use \Marando\AstroDate\AstroDate;
-use \Marando\AstroDate\TimeScale;
+use \Marando\IAU\IAU;
+use \Marando\JPLephem\DE\Reader;
+use \Marando\JPLephem\DE\SSObj;
+use \Marando\Units\Angle;
 use \Marando\Units\Distance;
 
 class Util {
@@ -34,6 +37,20 @@ class Util {
     $z = Distance::au($pv[2]);
 
     return $c = new Cartesian(Frame::ICRF(), $dt->toEpoch(), $x, $y, $z);
+  }
+
+  public static function pvsun(Reader $reader,          AstroDate $date) {
+    $jd = $date->toTDB()->toJD();
+    return static::pv2c($reader->jde($jd)->position(SSObj::Sun()), $date);
+  }
+
+  public static function trueObli(AstroDate $date) {
+    $jdTT = $date->toTT()->toJD();
+
+    IAU::Nut06a($jdTT, 0, $dpsi, $deps);
+    $obli = IAU::Obl06($jdTT, 0) + $deps;
+
+    return Angle::rad($obli);
   }
 
 }

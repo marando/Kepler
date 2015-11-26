@@ -246,6 +246,12 @@ class OrbitalElem {
 
       case 'r':
         return $this->calcRadius();
+
+      case 'name':
+      case 'node':
+      case 'incl':
+      case 'argPeri':
+        return $this->{$name};
     }
   }
 
