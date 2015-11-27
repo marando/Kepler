@@ -74,7 +74,7 @@ class Comet extends SmallBody {
 
     $this->orbitals;
     $comet = Util::pv2c([$x, $y, $z], $date);
-    $sun   = Util::pvsun($this->getDE(), $date);
+    $sun   = Util::xyzsun($this->getDE(), $date);
 
     // Return solar system barycentric position of comet
     return $sun->add($comet);
@@ -87,5 +87,7 @@ class Comet extends SmallBody {
   public function __toString() {
     return $this->orbitals->name;
   }
-
+  protected function getOrbitals() {
+    return $this->orbitals;
+  }
 }

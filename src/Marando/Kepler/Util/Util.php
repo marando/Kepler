@@ -28,6 +28,8 @@ use \Marando\JPLephem\DE\Reader;
 use \Marando\JPLephem\DE\SSObj;
 use \Marando\Units\Angle;
 use \Marando\Units\Distance;
+use \Marando\Units\Time;
+use \SebastianBergmann\RecursionContext\Exception;
 
 class Util {
 
@@ -39,7 +41,7 @@ class Util {
     return $c = new Cartesian(Frame::ICRF(), $dt->toEpoch(), $x, $y, $z);
   }
 
-  public static function pvsun(Reader $reader,          AstroDate $date) {
+  public static function xyzsun(Reader $reader, AstroDate $date) {
     $jd = $date->toTDB()->toJD();
     return static::pv2c($reader->jde($jd)->position(SSObj::Sun()), $date);
   }
@@ -51,6 +53,62 @@ class Util {
     $obli = IAU::Obl06($jdTT, 0) + $deps;
 
     return Angle::rad($obli);
+  }
+
+  public static function parseAstroDate($date) {
+    if (strtolower($date) == 'now')
+      return AstroDate::now ();
+
+    // AstroDate instance
+    if ($date instanceof AstroDate)
+      return $date;
+
+    // Try parsing Julian day count
+    if (is_numeric($date))
+      return AstroDate::jd($date);
+
+    // Try parsing string date representaation
+    if (is_string($date))
+      return AstroDate::parse($date);
+
+    throw new Exception("Unable to parse date {$date}");
+  }
+
+  public static function parseTime($time) {
+    // Time instance
+    if ($time instanceof Time)
+      return $time;
+
+    // Check if string has numeric then time span, if not throw exception
+    if (!preg_match('/^([0-9]*\.*[0-9]*)\s*([a-zA-Z]*)$/', $time, $tokens))
+      throw new Exception("Unable to parse time duration {$time}");
+
+    // Get the numeric and time span
+    $number = $tokens[1];
+    $unit   = strtolower($tokens[2]);
+
+    // Parse the time span
+    switch ($unit) {
+      case 'd':
+      case 'day':
+      case 'days':
+        return Time::days($number);
+
+      case 'h':
+      case 'hour':
+      case 'hours':
+        return Time::hours($number);
+
+      case 'm':
+      case 'min':
+      case 'minutes':
+        return Time::min($number);
+
+      case 's':
+      case 'sec':
+      case 'seconds':
+        return Time::sec($number);
+    }
   }
 
 }

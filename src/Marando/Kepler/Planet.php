@@ -30,8 +30,12 @@ abstract class Planet extends SolarSystObj {
   protected function getPosition(AstroDate $date) {
     $de = $this->getDE();
     $pv = $de->jde($date->toJD())->position($this->getSSObj());
-    
+
     return Util::pv2c($pv, $date);
+  }
+
+  protected function getOrbitals() {
+    return null;
   }
 
 }

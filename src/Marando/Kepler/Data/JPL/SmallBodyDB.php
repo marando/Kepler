@@ -53,7 +53,7 @@ class SmallBodyDB {
 
   protected function update() {
     // Check if within update hourly threshold
-    $d = $this->hoursSinceUpdate() ;
+    $d = $this->hoursSinceUpdate();
     if ($this->hoursSinceUpdate() < static::UPDATE_INTVL_H)
       return;
 
@@ -131,6 +131,7 @@ class SmallBodyDB {
         return OrbitalElem::comet($epoch, $q, $e, $i, $ω, $Ω, $T0, $cname);
       }
     }
+
   }
 
   /**

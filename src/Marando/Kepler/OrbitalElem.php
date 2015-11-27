@@ -20,11 +20,14 @@
 
 namespace Marando\Kepler;
 
+use \Exception;
+use \InvalidArgumentException;
 use \Marando\AstroDate\AstroDate;
 use \Marando\AstroDate\Epoch;
 use \Marando\Units\Angle;
 use \Marando\Units\Distance;
 use \Marando\Units\Time;
+use \Marando\Units\Velocity;
 
 /**
  * @property Epoch     $epoch
@@ -247,6 +250,9 @@ class OrbitalElem {
       case 'r':
         return $this->calcRadius();
 
+      case 'velocity':
+        return $this->calcVelocity();
+
       case 'name':
       case 'node':
       case 'incl':
@@ -261,7 +267,7 @@ class OrbitalElem {
         if ($value instanceof Epoch)
           return $this->epoch = $value;
         else
-          throw new \InvalidArgumentException();
+          throw new InvalidArgumentException();
     }
   }
 
@@ -275,6 +281,13 @@ class OrbitalElem {
     $Tn  = $this->epoch->jd + ($num * 360 / $n) - $sT0;
 
     return is_nan($Tn) ? null : AstroDate::jd($Tn);
+  }
+
+  public function atEpoch($epoch) {
+    // todo, parse any date string JD or epoch/astrodate instance
+    $this->epoch = $epoch;
+
+    return $this;
   }
 
   public function isParabolic() {
@@ -389,6 +402,14 @@ class OrbitalElem {
     return Distance::au($this->axis->au * (1 + $this->ecc));
   }
 
+  protected function calcVelocity() {
+    $r = $this->r->au;
+    $a = $this->axis->au;
+    $V = 42.1219 * sqrt((1 / $r) - (1 / (2 * $a)));
+
+    return Velocity::kms($V);
+  }
+
   protected function calcTrueAnomaly() {
     if ($this->isElliptic()) {
       $E = $this->eccAnomaly->deg;
@@ -439,6 +460,7 @@ class OrbitalElem {
     $E = $e < 1 ? sprintf("{$fmt}°", $this->eccAnomaly->deg) : $na;
     $ν = sprintf($fmt, $this->trueAnomaly->deg);
     $r = sprintf("{$fmt} AU", $this->r->au);
+    $V = sprintf("{$fmt} km/s", $this->velocity->kms);
 
     $T = $na;
     if ($e < 1) {
@@ -481,6 +503,7 @@ Mean anomaly            | {$M}
 Eccentric anomaly       | {$E}
 True anomaly            | {$ν}°
 Radius at epoch         | {$r}
+Radial Velocity         | {$V}
 ====================================================
 
 STR;
@@ -523,7 +546,7 @@ STR;
           $f  = $z1 * $g1;
           $q3 += $f;
           if ($z > 50 || abs($f) > $d1) {
-            throw new \Exception("no convergence");
+            throw new Exception("no convergence");
           }
           if (abs($f) <= $d) {
             break;
@@ -531,7 +554,7 @@ STR;
         }
         $l++;
         if ($l > 50) {
-          throw new \Exception("no convergence {$l}");
+          throw new Exception("no convergence {$l}");
         }
         while (true) {
           $s1 = $s;

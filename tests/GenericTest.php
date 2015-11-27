@@ -32,6 +32,47 @@ class GenericTest extends PHPUnit_Framework_TestCase {
 
   public function test() {
 
+    echo Comet::find('2015')->orbitalElem;
+    $earth = new Earth();
+    $earth->dateRange('now', '2015-nov-29', '12 hours');
+    $earth->observe(Comet::find('2015'));
+
+    //echo Comet::find('lovejoy')->orbitalElem->atEpoch(Epoch::J(2015.9));
+return;
+    $earth = new Earth();
+    $earth->dateRange('now', '2015-nov-29', '12 hours');
+    $earth->observe(Comet::find('67P'));
+return;
+
+
+    $earth = new Earth();
+    $earth->date('now');
+    $earth->observe(new Mercury);
+
+    return;
+    $earth = new Earth();
+    $earth->dates(['2015-01-19 TT', '2015-01-23 TT']);
+    $earth->observe(Comet::find('C/2014 Q2'));
+    echo $o     = Comet::find('C/2014 Q2')->orbitalElem;
+
+    $o->epoch = AstroDate::parse('2015-01-02 TT')->toEpoch();
+    echo $o;
+
+
+    $o->epoch = AstroDate::parse('2015-01-24 TT')->toEpoch();
+    echo $o;
+
+    //echo Comet::find('C/1980 E1')->orbitalElem;
+    exit;
+
+    $earth = new Earth();
+    $earth->dateRange('2015-nov-20', '2015-nov-23', '1 day');
+    $earth->observe(Comet::find('C/2015 W1'));
+
+
+
+
+    return;
     $earth = new Earth();
     $earth->observe(Comet::find('C/2015 W1'));
 
