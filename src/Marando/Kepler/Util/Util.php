@@ -33,6 +33,15 @@ use \SebastianBergmann\RecursionContext\Exception;
 
 class Util {
 
+  protected static $de;
+
+  public static function de() {
+    if (static::$de)
+      return static::$de;
+
+    return static::$de = new Reader();
+  }
+
   public static function pv2c(array $pv, AstroDate $dt) {
     $x = Distance::au($pv[0]);
     $y = Distance::au($pv[1]);
@@ -43,7 +52,7 @@ class Util {
 
   public static function xyzsun(Reader $reader, AstroDate $date) {
     $jd = $date->toTDB()->toJD();
-    return static::pv2c($reader->jde($jd)->position(SSObj::Sun()), $date);
+    return static::pv2c(static::de()->jde($jd)->position(SSObj::Sun()), $date);
   }
 
   public static function trueObli(AstroDate $date) {
@@ -57,7 +66,7 @@ class Util {
 
   public static function parseAstroDate($date) {
     if (strtolower($date) == 'now')
-      return AstroDate::now ();
+      return AstroDate::now();
 
     // AstroDate instance
     if ($date instanceof AstroDate)
@@ -89,6 +98,12 @@ class Util {
 
     // Parse the time span
     switch ($unit) {
+      case 'y':
+      case 'yr':
+      case 'year':
+      case 'years':
+        return Time::days($number * 365.25);
+
       case 'd':
       case 'day':
       case 'days':
@@ -109,6 +124,33 @@ class Util {
       case 'seconds':
         return Time::sec($number);
     }
+  }
+
+  /**
+   * Interpolates a y-value at a given x-value of a dataset using the Lagrange
+   * interpolation algorithm
+   *
+   * @param  float $x     x-value to interpolate
+   * @param  array $table Dataset
+   * @return float        interpolated value of y
+   */
+  public static function lagrangeInterp($x, $table) {
+    $sum = 0;
+    for ($i = 0; $i < count($table); $i++) {
+      $xi   = $table[$i][0];
+      $prod = 1;
+
+      for ($j = 0; $j < count($table); $j++) {
+        if ($i != $j) {
+          $xj = $table[$j][0];
+          $prod *= ($x - $xj) / ($xi - $xj);
+        }
+      }
+
+      $sum += $table[$i][1] * $prod;
+    }
+
+    return $sum;
   }
 
 }

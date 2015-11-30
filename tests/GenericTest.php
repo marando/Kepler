@@ -5,7 +5,10 @@ use \Marando\AstroDate\Epoch;
 use \Marando\Kepler\Comet;
 use \Marando\Kepler\OrbitalElem;
 use \Marando\Kepler\Planets\Earth;
+use \Marando\Kepler\Planets\Mars;
 use \Marando\Kepler\Planets\Mercury;
+use \Marando\Kepler\Planets\Moon;
+use \Marando\Kepler\Planets\Sun;
 use \Marando\Units\Angle;
 use \Marando\Units\Distance;
 use \Marando\Units\Time;
@@ -32,17 +35,79 @@ class GenericTest extends PHPUnit_Framework_TestCase {
 
   public function test() {
 
-    echo Comet::find('2015')->orbitalElem;
-    $earth = new Earth();
-    $earth->dateRange('now', '2015-nov-29', '12 hours');
-    $earth->observe(Comet::find('2015'));
+    //$e = new Earth();
+    //$e->dateRange('2015-01-01', '2016-01-01', '20 days');
+    //echo $e->observe(new Mercury(), false);
+    //echo $e->observe(new Mercury());
+    //return;
 
-    //echo Comet::find('lovejoy')->orbitalElem->atEpoch(Epoch::J(2015.9));
-return;
+    /**
+     * loop fine tuning until K or c is acceptable
+     */
+// UT1 on ->toTDB() is slow
+     $comet = Comet::find('C/2014 S2');
+
+    $e = new Earth();
+    $e->dates('2015-01-12', ' 2015-Sep-29');
+    $e->ca(new Mars, $date, $dist);
+echo "\n$date\t {$dist->au}";
+
+    return;
+    //echo "\n" . $e->date('2016-Feb-27 00:00:03.000 UTC')->observe($comet)[0]->distTrue->au;
+    //echo "\n" . $e->dateRange('now', '2016-03-08', '15 days')->observe($comet);
+    echo "\n\n" . Earth::closestApproach($comet, 'now', '2020-03-08', $date,
+            $dist);
+    echo "\n$date\t {$dist->au}";
+    return;
+
+    echo "\n\n" . Earth::closestApproach(new Moon, '2015-11-30', '2020-11-30',
+            $date, $dist);
+    echo "\n$date\t {$dist}";
+    return;
+
+
+    echo "\n\n" . AstroDate::jd(2457546.0315315);
+    echo "\n" . 0.49610389062451;
+
+    echo "\n";
+    $e = new Earth();
+    echo $e->date(2457546.0315315)->observe(new Mars)[0]->distTrue->au;
+    return;
+
+    echo $e->dateRange('now', '2018-11-30', '0.5 years')->observe(new Mars);
+
+    echo "\n\n$date\t$dist\n";
+
+    exit;
+
+    $comet = Comet::find('C/2013 US10');
+    echo $comet->orbitalElem;
+    //echo $comet->orbitalElem;
+
     $earth = new Earth();
-    $earth->dateRange('now', '2015-nov-29', '12 hours');
+    //$earth->dates('2014-Dec-29', '2015-Jan-06', '2015-Jan-16', '2015-Jan-20',
+    //        '2015-Jan-23');
+    //$earth->dateRange(AstroDate::now('EST'), '2015-Dec-2', '1 day');
+    //echo $comet->orbitalElem;
+    //echo $earth->observe($comet);
+
+
+    $earth->dateRange('2015-Nov-28', '2015-Dec-04', '1 day');
+    echo $earth->observe($comet);
+
+
+
+
+    return;
+
+    //$earth->observe(new Mercury());
+    //echo Comet::find('lovejoy')->orbitalElem->atEpoch(Epoch::J(2015.9));
+    return;
+    $earth = new Earth();
+    $earth->dateRange(AstroDate::now('EST'), '2015-nov-29', '12 hours');
     $earth->observe(Comet::find('67P'));
-return;
+
+    return;
 
 
     $earth = new Earth();
@@ -93,7 +158,7 @@ return;
      */
 
     // Elliptic orbit
-    echo $c = Comet::find('Halley');
+    echo $comet = Comet::find('Halley');
 
     // Near parabolic
     echo Comet::find('C/2014 Q2');
@@ -130,10 +195,10 @@ return;
 
 
 
-    $c = Comet::find('fds');
-    $c->observe(Comet::find('a'));
+    $comet = Comet::find('fds');
+    $comet->observe(Comet::find('a'));
 
-    $c->observe(new Earth());
+    $comet->observe(new Earth());
   }
 
 }

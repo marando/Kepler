@@ -257,6 +257,7 @@ class OrbitalElem {
       case 'node':
       case 'incl':
       case 'argPeri':
+      case 'timePeri':
         return $this->{$name};
     }
   }

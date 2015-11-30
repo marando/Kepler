@@ -4,8 +4,8 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "800d67582ba1e61ca4e012a532ae4574",
-    "content-hash": "eb4b23fc36b21e3a6d2208600046a76b",
+    "hash": "0f622af56318d98c3aefbe5b1fe9c424",
+    "content-hash": "0e3ecc16af5e6d0bd71d6a195beba213",
     "packages": [
         {
             "name": "marando/astrocoord",
@@ -90,6 +90,45 @@
             ],
             "description": "A PHP Date/Time class with useful astronomy related functionality",
             "time": "2015-11-23 00:15:23"
+        },
+        {
+            "name": "marando/interp",
+            "version": "0.1",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/marando/Interp.git",
+                "reference": "367cf4dd57337dcc4aa9af0ccfaf0c734ffc0a67"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/marando/Interp/zipball/367cf4dd57337dcc4aa9af0ccfaf0c734ffc0a67",
+                "reference": "367cf4dd57337dcc4aa9af0ccfaf0c734ffc0a67",
+                "shasum": ""
+            },
+            "require": {
+                "php": "^5.5"
+            },
+            "require-dev": {
+                "phpunit/phpunit": "^5.0"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-0": {
+                    "Marando": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "GNU2"
+            ],
+            "authors": [
+                {
+                    "name": "Ashley Marando",
+                    "email": "a.marando@me.com"
+                }
+            ],
+            "description": "A PHP data interpolation package",
+            "time": "2015-11-29 19:00:25"
         },
         {
             "name": "marando/jplephem",

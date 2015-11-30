@@ -18,28 +18,20 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
 
-namespace Marando\Kepler;
+namespace Marando\Kepler\Planets;
 
-use \Marando\AstroDate\AstroDate;
-use \Marando\JPLephem\DE\Reader;
 use \Marando\JPLephem\DE\SSObj;
-use \Marando\Kepler\Util\Util;
+use \Marando\Kepler\Planet;
+use \Marando\Units\Distance;
 
-abstract class Planet extends SolarSystObj {
+class Mars extends Planet {
 
-  protected function getPosition(AstroDate $date) {
-    $de = Util::de();
-    $pv = $de->jde($date->toJD())->position($this->getSSObj());
-
-    return Util::pv2c($pv, $date);
+  protected function getSSObj() {
+    return SSObj::Mars();
   }
 
-  protected function getOrbitals() {
-    return null;
-  }
-
-  protected function getName() {
-    return $this->getSSObj()->name;
+  protected function getTrueDiam() {
+    return Distance::km(7692);
   }
 
 }

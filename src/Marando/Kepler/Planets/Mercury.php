@@ -22,11 +22,16 @@ namespace Marando\Kepler\Planets;
 
 use \Marando\JPLephem\DE\SSObj;
 use \Marando\Kepler\Planet;
+use \Marando\Units\Distance;
 
 class Mercury extends Planet {
 
   protected function getSSObj() {
     return SSObj::Mercury();
+  }
+
+  protected function getTrueDiam() {
+    return Distance::km(4879);
   }
 
 }

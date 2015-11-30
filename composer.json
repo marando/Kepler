@@ -6,7 +6,8 @@
     "marando/jplephem": "^1.0",
     "marando/astrocoord": "^0.2.4",
     "marando/units": "^0.3.3",
-    "marando/php-sofa": "^0.2.5"
+    "marando/php-sofa": "^0.2.5",
+    "marando/interp": "^0.1.0"
   },
   "require-dev": {
     "phpunit/phpunit": "^5.0"

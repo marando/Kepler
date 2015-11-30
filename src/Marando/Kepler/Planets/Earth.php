@@ -23,6 +23,9 @@ namespace Marando\Kepler\Planets;
 use \Marando\JPLephem\DE\SSObj;
 use \Marando\Kepler\Planet;
 
+/**
+ * @property Geo $topo Description
+ */
 class Earth extends Planet {
 
   public function test() {
@@ -30,11 +33,16 @@ class Earth extends Planet {
   }
 
   public function topo() {
-    
+
   }
 
   protected function getSSObj() {
     return SSObj::Earth();
   }
+
+  protected function getTrueDiam() {
+    return Distance::km(12756);
+  }
+
 
 }
